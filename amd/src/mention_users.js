@@ -24,11 +24,24 @@
 /**
  * @module local_mention_users/mention
  */
-define(['jquery', 'local_mention_users/mention'], function($) {
+define(['jquery', 'theme_essential/bootstrap', 'local_mention_users/mention'], function($) {
 
     var module = {};
 
     module.init = function() {
+        // $.getScript( "https://rawgit.com/jakiestfu/Mention.js/master/mention.js" );
+        // $.getScript( "https://rawgit.com/jakiestfu/Mention.js/master/bootstrap-typeahead.js" );
+    	$("#multi-users").mention({
+    delimiter: '@',
+    users: [{
+        username: "ashley"
+    }, {
+        username: "roger"
+    }, {
+        username: "frecklefart123"
+    }]
+});
+
         console.log("geeeeejfsdlkjfklsdajflklsakfjkldsajfléksdajfklésdakjf");
     };
 
