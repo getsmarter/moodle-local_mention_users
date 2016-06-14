@@ -24,25 +24,26 @@
 /**
  * @module local_mention_users/mention
  */
-define(['jquery', 'theme_essential/bootstrap', 'local_mention_users/mention'], function($) {
+ define(['jquery', 'local_mention_users/tribute'], function($) {
 
     var module = {};
 
     module.init = function() {
-        // $.getScript( "https://rawgit.com/jakiestfu/Mention.js/master/mention.js" );
-        // $.getScript( "https://rawgit.com/jakiestfu/Mention.js/master/bootstrap-typeahead.js" );
-    	$("#multi-users").mention({
-    delimiter: '@',
-    users: [{
-        username: "ashley"
-    }, {
-        username: "roger"
-    }, {
-        username: "frecklefart123"
-    }]
-});
 
+        var tribute = new Tribute({
+          values: [
+          {key: 'Katniss Everdeen', value: 'Kat_Catching_Fire'},
+          {key: 'Foxface', value: 'foxyweapons'}
+          ]
+      })
+        console.log(tribute.collection[0].values[0]);
+        console.log(tribute.collection[0].values[1]);
         console.log("geeeeejfsdlkjfklsdajflklsakfjkldsajfléksdajfklésdakjf");
+
+        console.log(document.getElementById("id_messageeditable"));
+$(document).ready(function() {
+        tribute.attach(document.getElementById('id_messageeditable'));
+           });
     };
 
     return module;
