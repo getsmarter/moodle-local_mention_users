@@ -24,27 +24,57 @@
 /**
  * @module local_mention_users/mention
  */
- define(['jquery', 'local_mention_users/tribute'], function($) {
+define(['jquery', 'local_mention_users/tribute'], function($) {
 
-    var module = {};
+  var module = {};
 
-    module.init = function() {
+  module.init = function() {
 
-        var tribute = new Tribute({
-          values: [
-          {key: 'Katniss Everdeen', value: 'Kat_Catching_Fire'},
-          {key: 'Foxface', value: 'foxyweapons'}
-          ]
-      })
-        console.log(tribute.collection[0].values[0]);
-        console.log(tribute.collection[0].values[1]);
-        console.log("geeeeejfsdlkjfklsdajflklsakfjkldsajfléksdajfklésdakjf");
+    //   var tribute = new Tribute({
+    //     values: [
+    //     {key: 'Katniss Everdeen', value: 'Kat_Catching_Fire'},
+    //     {key: 'Foxface', value: 'foxyweapons'}
+    //     ]
+    // })
+    //         console.log(tribute.collection[0].values[0]);
+    //         console.log(tribute.collection[0].values[1]);
+    //         console.log("geeeeejfsdlkjfklsdajflklsakfjkldsajfléksdajfklésdakjf");
 
-        console.log(document.getElementById("id_messageeditable"));
-$(document).ready(function() {
+    //         console.log(document.getElementById("id_messageeditable"));
+    // $(document).ready(function() {
+    //         tribute.attach(document.getElementById('id_messageeditable'));
+    //            });
+
+    var reply_id = $('input[name=reply]').val();
+
+    function getActions(replyId) {
+      $.ajax({
+        dataType: "json",
+        url: '/local/mention_users/getusers.php',
+        data: 'action=tribute' + '&reply=' + replyId,
+        success: function(json) {
+
+          if (json.result) {
+            populateTributeArray(json.content);
+          } else {
+            window.alert(json.content);
+          }
+
+        }
+      });
+    }
+
+    function populateTributeArray(content) {
+      console.log('------------vege');
+      console.log(content);
+      var tribute = new Tribute(content)
+
+      $(document).ready(function() {
         tribute.attach(document.getElementById('id_messageeditable'));
-           });
-    };
+      });
+    }
 
-    return module;
+    getActions(reply_id);
+  };
+  return module;
 });

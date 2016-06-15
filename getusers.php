@@ -13,13 +13,8 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/local/mention_users/lib.php');
 
-$reply_id = required_param('reply', PARAM_INT); // Forum post ID
-error_log("geciiiiiiiasdjlfliasdjfilj");
-error_log(print_r($p,1));
-error_log("replyiddddd");
-//To do: check capability
-//$context = context_module::instance($cm->id);
-//require_capability('mod/forum:replypost', $context);
+$action = required_param('action', PARAM_TEXT); // Action
+$reply_id = required_param('reply', PARAM_INT); // Reply ID
 
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
@@ -28,45 +23,45 @@ $result->content = 'Unknown error';
 //Only allow to add action if logged in
 if(isloggedin()) {
 
-	if($action == 'like' || $action == 'thanks') {
-		// Insert new action record
-		$record = new stdClass();
-		$record->postid = $p;
-		$record->userid = $USER->id;
-		$record->action = $action;
-		$record->created = time();
+	if($action == 'tribute') {
 
-		$actionid = $DB->insert_record('forum_actions', $record, true);
+		global $DB;
+		$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
+		$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
 
-		//Get post to return
-		$sql = "
-		SELECT
-		    p.id
-		FROM
-		    {forum_posts} p
-		WHERE
-		    p.id = $p
-		";
+	// $users = get_enrolled_users($context);
 
-		$post = $DB->get_records_sql($sql);
+		$context = context_course::instance($course_id);
+		$role_id = $DB->get_field('role', 'id', array('shortname' => 'student'));
+		$users = get_role_users($role_id, $context);
 
-		populatePostActions($post);
+
+		$data = array();
+    //////////////////////////////////
+		foreach ($users as $user) {
+			$user_data = array("key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
+    	// array_push($data, "key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
+			$data[] = $user_data;
+
+		}
+
+		$post = array('values' => $data);
+		$post = json_encode($post);
+
+		// populatePostActions($post);
 
 		$result->result = true;
 		$result->content = $post;
-
 	}
 	else {
 		$result->result = false;
 		$result->content = 'Invalid action';
 	}
 }
-else {
-	$result->result = false;
-	$result->content = 'Your session has timed out. Please login again.';
-}
 
 header('Content-type: application/json');
 echo json_encode($result);
+		error_log('--------------------------ezek-------------------');
+		error_log(print_r($post,1));
 //echo '<pre>'.print_r($actionid, true).'</pre>';
 
