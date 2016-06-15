@@ -39,15 +39,17 @@ if(isloggedin()) {
 		$data = array();
     //////////////////////////////////
 		foreach ($users as $user) {
-			$user_data = array("key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
-    	// array_push($data, "key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
-			$data[] = $user_data;
+			// $user_data = array("key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
+    	array_push($data, $user->firstname . ' ' . $user->lastname, $user->id);
+    	// array_push($data, array("$user->firstname . ' ' . $user->lastname" => '$user->id'));
+			// array_push($data, array($user->firstname => $user->id));
+			// array_push($data, $user->id);
+			// $data[] = $user_data;
 
 		}
 
-		$post = array('values' => $data);
-		$post = json_encode($post);
-
+		$post = json_encode($data);
+		$proba = json_encode($data, JSON_FORCE_OBJECT);
 		// populatePostActions($post);
 
 		$result->result = true;
@@ -63,5 +65,6 @@ header('Content-type: application/json');
 echo json_encode($result);
 		error_log('--------------------------ezek-------------------');
 		error_log(print_r($post,1));
+		error_log(print_r($proba,1));
 //echo '<pre>'.print_r($actionid, true).'</pre>';
 

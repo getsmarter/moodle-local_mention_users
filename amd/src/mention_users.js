@@ -65,9 +65,35 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     }
 
     function populateTributeArray(content) {
+      var data = JSON.parse(content);
+
+      var users_array = [];
+
+      // for (i = 0 , y= 1; i < data.length; i++) {
+      //   users_array.push({key: data[i], value: data[y] });
+      //   i += 1;
+      //   y += 2;
+      //   // y += 1;
+      // }
+
+      for (i = 0; i < data.length; i += 2) {
+        users_array.push({key: data[i], value: data[i+1] });
+      }
+      // $.each(data, function(index, value) {
+      //   alert(index + ": " + value);
+      // });
       console.log('------------vege');
+
+
+      console.log(jQuery.type(data));
+            console.log(jQuery.type(content));
+      console.log(data);
       console.log(content);
-      var tribute = new Tribute(content)
+      console.log(users_array);
+
+      var tribute = new Tribute({
+        values: users_array
+      })
 
       $(document).ready(function() {
         tribute.attach(document.getElementById('id_messageeditable'));
