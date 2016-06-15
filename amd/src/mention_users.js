@@ -24,26 +24,12 @@
 /**
  * @module local_mention_users/mention
  */
+
 define(['jquery', 'local_mention_users/tribute'], function($) {
 
   var module = {};
 
   module.init = function() {
-
-    //   var tribute = new Tribute({
-    //     values: [
-    //     {key: 'Katniss Everdeen', value: 'Kat_Catching_Fire'},
-    //     {key: 'Foxface', value: 'foxyweapons'}
-    //     ]
-    // })
-    //         console.log(tribute.collection[0].values[0]);
-    //         console.log(tribute.collection[0].values[1]);
-    //         console.log("geeeeejfsdlkjfklsdajflklsakfjkldsajfléksdajfklésdakjf");
-
-    //         console.log(document.getElementById("id_messageeditable"));
-    // $(document).ready(function() {
-    //         tribute.attach(document.getElementById('id_messageeditable'));
-    //            });
 
     var reply_id = $('input[name=reply]').val();
 
@@ -69,30 +55,26 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
 
       var users_array = [];
 
-      // for (i = 0 , y= 1; i < data.length; i++) {
-      //   users_array.push({key: data[i], value: data[y] });
-      //   i += 1;
-      //   y += 2;
-      //   // y += 1;
-      // }
-
       for (i = 0; i < data.length; i += 2) {
-        users_array.push({key: data[i], value: data[i+1] });
+        users_array.push({
+          key: data[i],
+          value: data[i + 1]
+        });
       }
-      // $.each(data, function(index, value) {
-      //   alert(index + ": " + value);
-      // });
-      console.log('------------vege');
 
-
-      console.log(jQuery.type(data));
-            console.log(jQuery.type(content));
-      console.log(data);
-      console.log(content);
-      console.log(users_array);
+      // var tribute = new Tribute({
+      //   values: users_array
+      // })
 
       var tribute = new Tribute({
-        values: users_array
+        collection: [{
+          selectTemplate: function(item) {
+            // return '@' + item.original.key;
+            // return '<span contenteditable="false"><a href="http://zurb.com" target="_blank" title="' + item.original.email + '">' + item.original.key + '</a></span>';
+            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/profile.php?id=' + item.original.value + ' target="_blank" title="' + item.original.email + '">' + item.original.key + '</a></span>';
+          },
+          values: users_array
+        }]
       })
 
       $(document).ready(function() {
