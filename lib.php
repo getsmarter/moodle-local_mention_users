@@ -22,4 +22,46 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-global $PAGE;
+if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'mod/forum/post.php')) {
+	global $PAGE;
+	$PAGE->requires->css('/local/mention_users/tribute/tribute.css');
+	$PAGE->requires->js_call_amd('local_mention_users/mention_users', 'init');
+
+	global $DB;
+	$reply_id = required_param('reply', PARAM_INT); // Forum post ID
+	$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
+	$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
+
+	// $users = get_enrolled_users($context);
+
+	$context = context_course::instance($course_id);
+	$role_id = $DB->get_field('role', 'id', array('shortname' => 'student'));
+    $users = get_role_users($role_id, $context);
+
+
+     $data = array();
+    //////////////////////////////////
+    foreach ($users as $user) {
+    	$user_data = array("key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
+    	// array_push($data, "key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
+    	$data[] = $user_data;
+
+    }
+
+    	$post = array('values' => $data);
+    	// error_log(print_r(json_encode($data),1));
+    	error_log(print_r(json_encode($post),1));
+    // error_log(print_r($data,1));
+    ///////////////////////////////////
+
+
+    $json = json_encode($users);
+
+error_log("geciiiiiiiasdjlfliasdjfilj");
+error_log(print_r($reply_id,1));
+error_log(print_r($forum_discussions_id,1));
+error_log(print_r($course_id,1));
+// error_log(print_r($users,1));
+// error_log(print_r($json,1));
+error_log("replyiddddd");
+}
