@@ -71,7 +71,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
           selectTemplate: function(item) {
             // return '@' + item.original.key;
             // return '<span contenteditable="false"><a href="http://zurb.com" target="_blank" title="' + item.original.email + '">' + item.original.key + '</a></span>';
-            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/profile.php?id=' + item.original.value + ' target="_blank" title="' + item.original.email + '">' + item.original.key + '</a></span>';
+            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/profile.php?id=' + item.original.value + ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
           },
           values: users_array
         }]
@@ -80,6 +80,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       $(document).ready(function() {
         tribute.attach(document.getElementById('id_messageeditable'));
       });
+    console.log(tribute);
     }
 
     getActions(reply_id);
