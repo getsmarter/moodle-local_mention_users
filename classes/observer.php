@@ -30,32 +30,27 @@ class local_mention_users_observer {
     global $DB;
 
     $other = (object)$event->other;
+
     $content = $other->content;
+    $discussion_id = $other->discussionid;
+    $post_id = $event->objectid;
+    $course_id = $event->courseid;
 
     $id_array = self::parse_id($content);
+    $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
 
     error_log("geeeesdafsadfsadf------- ");
     error_log(print_r($id_array,1));
  }
 
- public function parse_id($content) {
-    $parsed_string_array = array();
-
+ public static function parse_id($content) {
     $string_array = explode('userid="',$content);
+    $id_array = array();
 
     for ($x = 1; $x < count($string_array); $x++) {
        $string = $string_array[$x];
-
-       $parsed_string=explode('userid="',$string)[0];
-       array_push($parsed_string_array,$parsed_string);
-
-    }
-
-    $id_array = array();
-
-    foreach($parsed_string_array as $string) {
-     $id = explode('">', $string)[0];
-     array_push($id_array, $id);
+       $id = explode('">', $string)[0];
+       array_push($id_array, $id);
     }
 
     return $id_array;

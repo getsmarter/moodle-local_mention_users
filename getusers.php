@@ -31,16 +31,40 @@ if(isloggedin()) {
 
 	// $users = get_enrolled_users($context);
 
-		$context = context_course::instance($course_id);
-		$role_id = $DB->get_field('role', 'id', array('shortname' => 'student'));
-		$users = get_role_users($role_id, $context);
+		//$context = context_course::instance($course_id);
+		//error_log(print_r($context,1));
+		//$role_id = $DB->get_field('role', 'id', array('shortname' => 'student'));
+		//$users = get_role_users($role_id, $context);
+
+		/////////////////////////////////
+		$sql = "
+			SELECT DISTINCT
+				ue.userid,
+				e.courseid,
+				u.firstname,
+				u.lastname,
+				u.username,
+				r.shortname
+			FROM gs.mdl_user_enrolments ue
+			JOIN gs.mdl_enrol e ON (e.id = ue.enrolid)
+			JOIN gs.mdl_user u ON (ue.userid = u.id)
+			JOIN gs.mdl_role_assignments ra ON (u.id = ra.userid)
+			JOIN gs.mdl_role r ON (ra.roleid = r.id)
+			WHERE e.courseid = ?
+			AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+			ORDER BY firstname
+			;";
+
+		$users = $DB->get_records_sql($sql, array($course_id));
+
+		////////////////////////////////
 
 
 		$data = array();
     //////////////////////////////////
 		foreach ($users as $user) {
 			// $user_data = array("key" => $user->firstname . ' ' . $user->lastname, "value" => $user->id);
-    	array_push($data, $user->firstname . ' ' . $user->lastname, $user->id);
+			array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
     	// array_push($data, array("$user->firstname . ' ' . $user->lastname" => '$user->id'));
 			// array_push($data, array($user->firstname => $user->id));
 			// array_push($data, $user->id);
@@ -63,8 +87,8 @@ if(isloggedin()) {
 
 header('Content-type: application/json');
 echo json_encode($result);
-		error_log('--------------------------ezek-------------------');
-		error_log(print_r($post,1));
-		error_log(print_r($proba,1));
+error_log('--------------------------ezek-------------------');
+error_log(print_r($post,1));
+error_log(print_r($proba,1));
 //echo '<pre>'.print_r($actionid, true).'</pre>';
 
