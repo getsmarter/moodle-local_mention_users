@@ -490,13 +490,9 @@ define(["jquery"], function(jQuery) {
             } else {
               coordinates = this.getContentEditableCaretPosition(info.mentionPosition)
             }
-            // console.log(jQuery.type(coordinates.top))
-            // console.log(jQuery.type($('#id_messageeditable').offset().top))
-            // var topposition = $('#id_messageeditable').offset().top + coordinates.top
-            // console.log(topposition)
-            // console.log(coordinates.top)
+
             // Move the button into place.
-            this.tribute.menu.style.cssText = `top: ${coordinates.top+1000} px;
+            this.tribute.menu.style.cssText = `top: ${$('#id_messageeditable').offset().top+24}px;
                                                left: ${coordinates.left}px;
                                                position: absolute;
                                                zIndex: 10000;
@@ -886,7 +882,7 @@ define(["jquery"], function(jQuery) {
               targetY = maxY
             }
 
-            window.scrollTo(0, targetY)
+            // window.scrollTo(0, targetY)
           }
         }
       }
