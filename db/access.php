@@ -15,16 +15,26 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Segment
+ * mention_users
  *
- * @package    local_segment
+ * @package    local_mention_users
  * @copyright  2014 GetSmarter {@link http://www.getsmarter.co.za}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-if(get_config('local_mention_users', 'enabletracking') == 1) {
-	if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'mod/forum/post.php')) {
-		global $PAGE;
-		$PAGE->requires->css('/local/mention_users/tribute/tribute.css');
-		$PAGE->requires->js_call_amd('local_mention_users/mention_users', 'init');
-	}
-}
+
+defined('MOODLE_INTERNAL') || die;
+
+$capabilities = array(
+    'local/mention_users:view' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array()
+    ),
+
+    'local/mention_users:manage' => array(
+        'riskbitmask' => RISK_CONFIG,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array()
+    ),
+);

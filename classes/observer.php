@@ -41,7 +41,7 @@ class local_mention_users_observer {
 
     $id_array = self::parse_id($content);
 
-    self::send_email_to_students($id_array, $course_name, $course_coach);
+    self::send_email_to_students($id_array, $course_name, $course_coach, $link);
 
     $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
 
@@ -62,7 +62,7 @@ class local_mention_users_observer {
     return $id_array;
  }
 
- public static function send_email_to_students($id_array, $course_name, $course_coach) {
+ public static function send_email_to_students($id_array, $course_name, $course_coach, $link) {
   foreach ($id_array as $id) {
     global $DB;
     global $CFG;
@@ -72,19 +72,14 @@ class local_mention_users_observer {
     $testuser = $DB->get_record('user', array('id'=>11577));
     error_log(print_r($testuser,1));
     $subject = 'Forum Post - You have been Mentioned in a Forum Post | ' . $course_name;
-    $body = 'Hi' . $student->firstname .
-            'You have been mentioned in a forum post. Please click the following link to view.
+    $body = 'Hi ' . $student->firstname .'
+            You have been mentioned in a forum post. Please click the following <a href="' . $link . '">Link</a> to view.
             Regards,
-            ';
+            ' . $course_coach->firstname;
 
     $bodyhtml = text_to_html($body, null, false, true);
-    error_log("emaileleje-------------------------------------------------------------");
-    error_log(print_r($testuser->email,1));
-    error_log(print_r($subject,1));
-    error_log(print_r($body,1));
-    error_log(print_r($bodyhtml,1));
+
     email_to_user($testuser, $testuser, $subject, $body, $bodyhtml);
-    error_log("emailvege-------------------------------------------------------------------");
   }
  }
 
@@ -92,7 +87,7 @@ class local_mention_users_observer {
     global $DB;
 
     $context = context_course::instance($course_id);
-    $role_id = $DB->get_field("role", "id", array("shortname"=>'editingteacher'));
+    $role_id = get_config('local_mention_users', 'emailfromrole');
     $users = get_role_users($role_id, $context);
     $user = current($users);
     return $user;

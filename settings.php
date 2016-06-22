@@ -31,9 +31,21 @@ $ADMIN->add('localplugins', new admin_category('local_mention_users', get_string
 $temp = new admin_settingpage('local_mention_users_general',  'Settings', 'local/mention_users:manage');
 
   // Enable tracking
-  $name = 'local_mention_users/enabletracking';
-  $title = 'Enable tracking';
-  $description = 'Enable or disable mention_users event tracking.';
-  $default = 0;
-  $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
-  $temp->add($setting);
+$name = 'local_mention_users/enabletracking';
+$title = 'Enable tracking';
+$description = 'Enable or disable mention_users event tracking.';
+$default = 0;
+$setting = new admin_setting_configcheckbox($name, $title, $description, $default);
+$temp->add($setting);
+
+  // Send to this role
+$name = 'local_mention_users/emailfromrole';
+$title = 'Send from role';
+$description = 'The role of the course instructor or other person you want emails to be sent from. Emails will be sent from the first user with this role in the course.';
+$default = 5;
+$context = context_course::instance(1); // site wide course context
+$roles = get_assignable_roles($context);
+$setting = new admin_setting_configselect($name, $title, $description, $default, $roles);
+$temp->add($setting);
+
+$ADMIN->add('local_mention_users', $temp);
