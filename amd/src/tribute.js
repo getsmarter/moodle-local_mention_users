@@ -492,7 +492,7 @@ define(["jquery"], function(jQuery) {
             }
 
             // Move the button into place.
-            this.tribute.menu.style.cssText = `top: ${coordinates.top}px;
+            this.tribute.menu.style.cssText = `top: ${coordinates.top+1110}px;
                                                left: ${coordinates.left}px;
                                                position: absolute;
                                                zIndex: 10000;

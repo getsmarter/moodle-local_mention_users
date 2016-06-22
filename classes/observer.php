@@ -36,7 +36,13 @@ class local_mention_users_observer {
     $post_id = $event->objectid;
     $course_id = $event->courseid;
 
+    $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
+    $course_coach = self::get_course_coach($course_id);
+
     $id_array = self::parse_id($content);
+
+    self::send_email_to_students($id_array, $course_name, $course_coach);
+
     $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
 
     error_log("geeeesdafsadfsadf------- ");
@@ -54,6 +60,42 @@ class local_mention_users_observer {
     }
 
     return $id_array;
+ }
+
+ public static function send_email_to_students($id_array, $course_name, $course_coach) {
+  foreach ($id_array as $id) {
+    global $DB;
+    global $CFG;
+    require_once($CFG->libdir.'/moodlelib.php');
+
+    $student = $DB->get_record('user', array('id'=>$id));
+    $testuser = $DB->get_record('user', array('id'=>11577));
+    error_log(print_r($testuser,1));
+    $subject = 'Forum Post - You have been Mentioned in a Forum Post | ' . $course_name;
+    $body = 'Hi' . $student->firstname .
+            'You have been mentioned in a forum post. Please click the following link to view.
+            Regards,
+            ';
+
+    $bodyhtml = text_to_html($body, null, false, true);
+    error_log("emaileleje-------------------------------------------------------------");
+    error_log(print_r($testuser->email,1));
+    error_log(print_r($subject,1));
+    error_log(print_r($body,1));
+    error_log(print_r($bodyhtml,1));
+    email_to_user($testuser, $testuser, $subject, $body, $bodyhtml);
+    error_log("emailvege-------------------------------------------------------------------");
+  }
+ }
+
+ public static function get_course_coach($course_id) {
+    global $DB;
+
+    $context = context_course::instance($course_id);
+    $role_id = $DB->get_field("role", "id", array("shortname"=>'editingteacher'));
+    $users = get_role_users($role_id, $context);
+    $user = current($users);
+    return $user;
  }
 }
 
