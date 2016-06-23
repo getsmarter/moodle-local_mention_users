@@ -48,4 +48,28 @@ $roles = get_assignable_roles($context);
 $setting = new admin_setting_configselect($name, $title, $description, $default, $roles);
 $temp->add($setting);
 
+  // Email subject
+$name = 'local_mention_users/defaultproperties_subject';
+$title = 'Email Subject';
+$description = 'The value for the subject of an email.';
+$default =
+"Forum Post - You have been Mentioned in a Forum Post | {course_fullname}";
+$setting = new admin_setting_configtextarea($name, $title, $description, $default);
+$temp->add($setting);
+
+  //Email body
+$name = 'local_mention_users/defaultproperties_body';
+$title = 'Email Body';
+$description = 'The value for the body of an email.';
+$default =
+"Hi {student_first_name},
+
+You have been mentioned in a forum post. Please click the following link to view.
+{post_link}
+
+Regards,
+{coach_first_name}";
+$setting = new admin_setting_configtextarea($name, $title, $description, $default);
+$temp->add($setting);
+
 $ADMIN->add('local_mention_users', $temp);

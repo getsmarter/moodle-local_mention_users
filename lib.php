@@ -24,6 +24,7 @@
 if(get_config('local_mention_users', 'enabletracking') == 1) {
 	if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'mod/forum/post.php')) {
 		global $PAGE;
+		error_log(print_r($_SERVER,1));
 		$PAGE->requires->css('/local/mention_users/tribute/tribute.css');
 		$PAGE->requires->js_call_amd('local_mention_users/mention_users', 'init');
 	}

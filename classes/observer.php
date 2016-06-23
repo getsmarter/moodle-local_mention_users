@@ -41,12 +41,12 @@ class local_mention_users_observer {
 
     $id_array = self::parse_id($content);
 
+    $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
     self::send_email_to_students($id_array, $course_name, $course_coach, $link);
 
-    $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
 
     error_log("geeeesdafsadfsadf------- ");
-    error_log(print_r($id_array,1));
+    // error_log(print_r($id_array,1));
  }
 
  public static function parse_id($content) {
@@ -69,17 +69,25 @@ class local_mention_users_observer {
     require_once($CFG->libdir.'/moodlelib.php');
 
     $student = $DB->get_record('user', array('id'=>$id));
-    $testuser = $DB->get_record('user', array('id'=>11577));
-    error_log(print_r($testuser,1));
-    $subject = 'Forum Post - You have been Mentioned in a Forum Post | ' . $course_name;
-    $body = 'Hi ' . $student->firstname .'
-            You have been mentioned in a forum post. Please click the following <a href="' . $link . '">Link</a> to view.
-            Regards,
-            ' . $course_coach->firstname;
-
+    error_log(print_r($student->email,1));
+    // $testuser = $DB->get_record('user', array('id'=>11577));
+    // error_log(print_r($testuser,1));
+    // $subject = 'Forum Post - You have been Mentioned in a Forum Post | ' . $course_name;
+    $subject = get_config('local_mention_users', 'defaultproperties_subject');
+    $body = get_config('local_mention_users', 'defaultproperties_body');
+    // $body = 'Hi ' . $student->firstname .'
+    //         You have been mentioned in a forum post. Please click the following <a href="' . $link . '">Link</a> to view.
+    //         Regards,
+    //         ' . $course_coach->firstname;
+    $subject = str_replace("{course_fullname}", $course_name, $subject);
+    $body = str_replace("{student_first_name}", $student->firstname, $body);
+    $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
+    // $body = str_replace("{post_link}", $link, $body);
+    $body = str_replace("{post_link}", 'http://' . $link, $body);
+    error_log(print_r($body,1));
     $bodyhtml = text_to_html($body, null, false, true);
 
-    email_to_user($testuser, $testuser, $subject, $body, $bodyhtml);
+    email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
   }
  }
 
