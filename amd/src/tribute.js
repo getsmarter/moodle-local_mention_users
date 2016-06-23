@@ -1,912 +1,1039 @@
 define(["jquery"], function(jQuery) {
-    if (!Array.prototype.find) {
-      Array.prototype.find = function(predicate) {
-        if (this === null) {
-          throw new TypeError('Array.prototype.find called on null or undefined')
-        }
-        if (typeof predicate !== 'function') {
-          throw new TypeError('predicate must be a function')
-        }
-        var list = Object(this)
-        var length = list.length >>> 0
-        var thisArg = arguments[1]
-        var value
 
-        for (var i = 0; i < length; i++) {
-          value = list[i]
-          if (predicate.call(thisArg, value, i, list)) {
-            return value
-          }
-        }
-        return undefined
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+if (!Array.prototype.find) {
+  Array.prototype.find = function (predicate) {
+    if (this === null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
       }
     }
+    return undefined;
+  };
+}
 
-    {
-      class Tribute {
-        constructor({
-            values=null, iframe=null, selectClass='highlight', trigger='@',
-            selectTemplate=null, menuItemTemplate=null,lookup='key',
-            fillAttr='value', collection=null, menuContainer=null}) {
+(function () {
 
-          this.menuSelected = 0
-          this.current = {}
-          this.inputEvent = false
-          this.isActive = false
-          this.menuContainer = menuContainer
+  if (typeof window.CustomEvent === "function") return false;
 
-          if (values) {
-            this.collection = [{
-              // symbol that starts the lookup
-              trigger: trigger,
+  function CustomEvent(event, params) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    var evt = document.createEvent('CustomEvent');
+    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+    return evt;
+  }
 
-              iframe: iframe,
+  CustomEvent.prototype = window.Event.prototype;
 
-              selectClass: selectClass,
+  window.CustomEvent = CustomEvent;
+})();
 
-              // function called on select that retuns the content to insert
-              selectTemplate: (selectTemplate || Tribute.defaultSelectTemplate).bind(this),
+{
+  (function () {
+    var Tribute = function () {
+      function Tribute(_ref) {
+        var _this = this;
 
-              menuItemTemplate: (menuItemTemplate || Tribute.defaultMenuItemTemplate).bind(this),
+        var _ref$values = _ref.values;
+        var values = _ref$values === undefined ? null : _ref$values;
+        var _ref$iframe = _ref.iframe;
+        var iframe = _ref$iframe === undefined ? null : _ref$iframe;
+        var _ref$selectClass = _ref.selectClass;
+        var selectClass = _ref$selectClass === undefined ? 'highlight' : _ref$selectClass;
+        var _ref$trigger = _ref.trigger;
+        var trigger = _ref$trigger === undefined ? '@' : _ref$trigger;
+        var _ref$selectTemplate = _ref.selectTemplate;
+        var selectTemplate = _ref$selectTemplate === undefined ? null : _ref$selectTemplate;
+        var _ref$menuItemTemplate = _ref.menuItemTemplate;
+        var menuItemTemplate = _ref$menuItemTemplate === undefined ? null : _ref$menuItemTemplate;
+        var _ref$lookup = _ref.lookup;
+        var lookup = _ref$lookup === undefined ? 'key' : _ref$lookup;
+        var _ref$fillAttr = _ref.fillAttr;
+        var fillAttr = _ref$fillAttr === undefined ? 'value' : _ref$fillAttr;
+        var _ref$collection = _ref.collection;
+        var collection = _ref$collection === undefined ? null : _ref$collection;
+        var _ref$menuContainer = _ref.menuContainer;
+        var menuContainer = _ref$menuContainer === undefined ? null : _ref$menuContainer;
 
-              // column to search against in the object
-              lookup: lookup,
+        _classCallCheck(this, Tribute);
 
-              // column that contains the content to insert by default
-              fillAttr: fillAttr,
+        this.menuSelected = 0;
+        this.current = {};
+        this.inputEvent = false;
+        this.isActive = false;
+        this.menuContainer = menuContainer;
 
-              // array of objects
-              values: values
-            }]
-          } else if (collection) {
-            this.collection = collection.map(item => {
-              return {
-                trigger: item.trigger || trigger,
-                iframe: item.iframe || iframe,
-                selectClass: item.selectClass || selectClass,
-                selectTemplate: (item.selectTemplate || Tribute.defaultSelectTemplate).bind(this),
-                menuItemTemplate: (item.menuItemTemplate || Tribute.defaultMenuItemTemplate).bind(this),
-                lookup: item.lookup || lookup,
-                fillAttr: item.fillAttr || fillAttr,
-                values: item.values
-              }
-            })
-          } else {
-            throw new Error('[Tribute] No collection specified.')
-          }
+        if (values) {
+          this.collection = [{
+            // symbol that starts the lookup
+            trigger: trigger,
 
-          new TributeRange(this)
-          new TributeEvents(this)
-          new TributeMenuEvents(this)
-          new TributeSearch(this)
+            iframe: iframe,
+
+            selectClass: selectClass,
+
+            // function called on select that retuns the content to insert
+            selectTemplate: (selectTemplate || Tribute.defaultSelectTemplate).bind(this),
+
+            menuItemTemplate: (menuItemTemplate || Tribute.defaultMenuItemTemplate).bind(this),
+
+            // column to search against in the object
+            lookup: lookup,
+
+            // column that contains the content to insert by default
+            fillAttr: fillAttr,
+
+            // array of objects
+            values: values
+          }];
+        } else if (collection) {
+          this.collection = collection.map(function (item) {
+            return {
+              trigger: item.trigger || trigger,
+              iframe: item.iframe || iframe,
+              selectClass: item.selectClass || selectClass,
+              selectTemplate: (item.selectTemplate || Tribute.defaultSelectTemplate).bind(_this),
+              menuItemTemplate: (item.menuItemTemplate || Tribute.defaultMenuItemTemplate).bind(_this),
+              lookup: item.lookup || lookup,
+              fillAttr: item.fillAttr || fillAttr,
+              values: item.values
+            };
+          });
+        } else {
+          throw new Error('[Tribute] No collection specified.');
         }
 
-        static defaultSelectTemplate(item) {
-          return `@${item.original[this.current.collection.fillAttr]}`
-        }
+        new TributeRange(this);
+        new TributeEvents(this);
+        new TributeMenuEvents(this);
+        new TributeSearch(this);
+      }
 
-        static defaultMenuItemTemplate(matchItem) {
-          return matchItem.string
+      _createClass(Tribute, [{
+        key: 'triggers',
+        value: function triggers() {
+          return this.collection.map(function (config) {
+            return config.trigger;
+          });
         }
-
-        static inputTypes() {
-          return ['TEXTAREA','INPUT']
-        }
-
-        triggers() {
-          return this.collection.map(config => {
-            return config.trigger
-          })
-        }
-
-        attach(el) {
+      }, {
+        key: 'attach',
+        value: function attach(el) {
           if (!el) {
-            throw new Error('[Tribute] Must pass in a DOM node or NodeList.')
+            throw new Error('[Tribute] Must pass in a DOM node or NodeList.');
           }
 
           // Check if it is a jQuery collection
           if (typeof jQuery !== 'undefined' && el instanceof jQuery) {
-            el = el.get()
+            el = el.get();
           }
 
           // Is el an Array/Array-like object?
           if (el.constructor === NodeList || el.constructor === HTMLCollection || el.constructor === Array) {
-            let length = el.length
+            var length = el.length;
             for (var i = 0; i < length; ++i) {
-              this._attach(el[i])
+              this._attach(el[i]);
             }
           } else {
-            this._attach(el)
+            this._attach(el);
           }
         }
-
-        _attach(el) {
+      }, {
+        key: '_attach',
+        value: function _attach(el) {
           if (el.hasAttribute('data-tribute')) {
-            console.warn('Tribute was already bound to ' + el.nodeName)
+            console.warn('Tribute was already bound to ' + el.nodeName);
           }
 
-          this.ensureEditable(el)
-          this.events.bind(el)
-          el.setAttribute('data-tribute', true)
+          this.ensureEditable(el);
+          this.events.bind(el);
+          el.setAttribute('data-tribute', true);
         }
-
-        ensureEditable(element) {
+      }, {
+        key: 'ensureEditable',
+        value: function ensureEditable(element) {
           if (Tribute.inputTypes().indexOf(element.nodeName) === -1) {
             if (element.contentEditable) {
-              element.contentEditable = true
+              element.contentEditable = true;
             } else {
-              throw new Error('[Tribute] Cannot bind to ' + element.nodeName)
+              throw new Error('[Tribute] Cannot bind to ' + element.nodeName);
             }
           }
         }
+      }, {
+        key: 'createMenu',
+        value: function createMenu() {
+          var wrapper = this.range.getDocument().createElement('div'),
+              ul = this.range.getDocument().createElement('ul');
 
-        createMenu() {
-          let wrapper = this.range.getDocument().createElement('div'),
-              ul = this.range.getDocument().createElement('ul')
-
-          wrapper.className = 'tribute-container'
-          wrapper.appendChild(ul)
+          wrapper.className = 'tribute-container';
+          wrapper.appendChild(ul);
 
           if (this.menuContainer) {
-            return this.menuContainer.appendChild(wrapper)
+            return this.menuContainer.appendChild(wrapper);
           }
 
-          return this.range.getDocument().body.appendChild(wrapper)
+          return this.range.getDocument().body.appendChild(wrapper);
         }
+      }, {
+        key: 'showMenuFor',
+        value: function showMenuFor(element, collectionItem) {
+          var _this2 = this;
 
-        showMenuFor(element, collectionItem) {
-          let items
+          var items = void 0;
           // create the menu if it doesn't exist.
           if (!this.menu) {
-            this.menu = this.createMenu()
-            this.menuEvents.bind(this.menu)
+            this.menu = this.createMenu();
+            this.menuEvents.bind(this.menu);
           }
 
-          this.isActive = true
-          this.menuSelected = 0
+          this.isActive = true;
+          this.menuSelected = 0;
 
           if (!this.current.mentionText) {
-            this.current.mentionText = ''
+            this.current.mentionText = '';
           }
 
           items = this.search.filter(this.current.mentionText, this.current.collection.values, {
             pre: '<span>',
             post: '</span>',
-            extract: (el) => {
-              return el[this.current.collection.lookup]
+            extract: function extract(el) {
+              return el[_this2.current.collection.lookup];
             }
-          })
+          });
 
-          this.current.filteredItems = items
+          this.current.filteredItems = items;
 
           if (!items.length) {
-            this.hideMenu()
-            return
+            this.hideMenu();
+            return;
           }
 
-          let ul = this.menu.querySelector('ul')
+          var ul = this.menu.querySelector('ul');
 
-          ul.innerHTML = ''
+          ul.innerHTML = '';
 
-          items.forEach((item, index) => {
-            let li = this.range.getDocument().createElement('li')
-            li.setAttribute('data-index', index)
-            if (this.menuSelected === index) {
-              li.className = this.current.collection.selectClass
+          items.forEach(function (item, index) {
+            var li = _this2.range.getDocument().createElement('li');
+            li.setAttribute('data-index', index);
+            if (_this2.menuSelected === index) {
+              li.className = _this2.current.collection.selectClass;
             }
-            li.innerHTML = this.current.collection.menuItemTemplate(item)
-            ul.appendChild(li)
-          })
+            li.innerHTML = _this2.current.collection.menuItemTemplate(item);
+            ul.appendChild(li);
+          });
 
-          this.range.positionMenuAtCaret()
-
+          this.range.positionMenuAtCaret();
         }
-
-        hideMenu() {
+      }, {
+        key: 'hideMenu',
+        value: function hideMenu() {
           if (this.menu) {
-            this.menu.style.cssText = 'display: none;'
-            this.isActive = false
-            this.menuSelected = 0
-            this.current = {}
+            this.menu.style.cssText = 'display: none;';
+            this.isActive = false;
+            this.menuSelected = 0;
+            this.current = {};
           }
         }
-
-        selectItemAtIndex(index) {
-          let item = this.current.filteredItems[index]
-          let content = this.current.collection.selectTemplate(item)
-          this.replaceText(content)
+      }, {
+        key: 'selectItemAtIndex',
+        value: function selectItemAtIndex(index) {
+          var item = this.current.filteredItems[index];
+          var content = this.current.collection.selectTemplate(item);
+          this.replaceText(content);
         }
-
-        replaceText(content) {
-          this.range.replaceTriggerText(content, true, true)
+      }, {
+        key: 'replaceText',
+        value: function replaceText(content) {
+          this.range.replaceTriggerText(content, true, true);
         }
+      }], [{
+        key: 'defaultSelectTemplate',
+        value: function defaultSelectTemplate(item) {
+          return '@' + item.original[this.current.collection.fillAttr];
+        }
+      }, {
+        key: 'defaultMenuItemTemplate',
+        value: function defaultMenuItemTemplate(matchItem) {
+          return matchItem.string;
+        }
+      }, {
+        key: 'inputTypes',
+        value: function inputTypes() {
+          return ['TEXTAREA', 'INPUT'];
+        }
+      }]);
+
+      return Tribute;
+    }();
+
+    var TributeMenuEvents = function () {
+      function TributeMenuEvents(tribute) {
+        _classCallCheck(this, TributeMenuEvents);
+
+        this.tribute = tribute;
+        this.tribute.menuEvents = this;
+        this.menu = this.tribute.menu;
       }
 
-      class TributeMenuEvents {
-        constructor(tribute) {
-          this.tribute = tribute
-          this.tribute.menuEvents = this
-          this.menu = this.tribute.menu
-        }
+      _createClass(TributeMenuEvents, [{
+        key: 'bind',
+        value: function bind(menu) {
+          var _this3 = this;
 
-        bind(menu) {
-          menu.addEventListener('keydown',
-            this.tribute.events.keydown.bind(this.menu, this), false)
-          this.tribute.range.getDocument().addEventListener('click',
-            this.tribute.events.click.bind(null, this), false)
-          window.addEventListener('resize', this.debounce(() => {
-            if (this.tribute.isActive) {
-              this.tribute.showMenuFor(this.tribute.current.element)
+          menu.addEventListener('keydown', this.tribute.events.keydown.bind(this.menu, this), false);
+          this.tribute.range.getDocument().addEventListener('click', this.tribute.events.click.bind(null, this), false);
+          window.addEventListener('resize', this.debounce(function () {
+            if (_this3.tribute.isActive) {
+              _this3.tribute.showMenuFor(_this3.tribute.current.element);
             }
-          }, 300, false))
+          }, 300, false));
         }
+      }, {
+        key: 'debounce',
+        value: function debounce(func, wait, immediate) {
+          var _this4 = this,
+              _arguments = arguments;
 
-        debounce(func, wait, immediate) {
-          var timeout
-          return () => {
-            var context = this, args = arguments
-            var later = () => {
-              timeout = null
-              if (!immediate) func.apply(context, args)
-            }
-            var callNow = immediate && !timeout
-            clearTimeout(timeout)
-            timeout = setTimeout(later, wait)
-            if (callNow) func.apply(context, args)
-          }
+          var timeout;
+          return function () {
+            var context = _this4,
+                args = _arguments;
+            var later = function later() {
+              timeout = null;
+              if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+          };
         }
+      }]);
+
+      return TributeMenuEvents;
+    }();
+
+    var TributeEvents = function () {
+      function TributeEvents(tribute) {
+        _classCallCheck(this, TributeEvents);
+
+        this.tribute = tribute;
+        this.tribute.events = this;
       }
 
-      class TributeEvents {
-        constructor(tribute) {
-          this.tribute = tribute
-          this.tribute.events = this
+      _createClass(TributeEvents, [{
+        key: 'bind',
+        value: function bind(element) {
+          element.addEventListener('keydown', this.keydown.bind(element, this), false);
+          element.addEventListener('keyup', this.keyup.bind(element, this), false);
+          element.addEventListener('input', this.input.bind(element, this), false);
         }
-
-        static keys() {
-          return [
-            {key: 9,  value: 'TAB'},
-            {key: 13, value: 'ENTER'},
-            {key: 27, value: 'ESCAPE'},
-            {key: 38, value: 'UP'},
-            {key: 40, value: 'DOWN'}
-          ]
-        }
-
-        bind(element) {
-          element.addEventListener('keydown',
-            this.keydown.bind(element, this), false)
-          element.addEventListener('keyup',
-            this.keyup.bind(element, this), false)
-          element.addEventListener('input',
-            this.input.bind(element, this), false)
-        }
-
-        keydown(instance, event) {
+      }, {
+        key: 'keydown',
+        value: function keydown(instance, event) {
           if (instance.shouldDeactivate(event)) {
-            instance.tribute.isActive = false
+            instance.tribute.isActive = false;
           }
 
-          let element = this
-          instance.commandEvent = false
+          var element = this;
+          instance.commandEvent = false;
 
-          TributeEvents.keys().forEach(o => {
+          TributeEvents.keys().forEach(function (o) {
             if (o.key === event.keyCode) {
-              instance.commandEvent = true
-              instance.callbacks()[o.value.toLowerCase()](event, element)
+              instance.commandEvent = true;
+              instance.callbacks()[o.value.toLowerCase()](event, element);
             }
-          })
+          });
         }
-
-        input(instance, event) {
-          instance.inputEvent = true
-          instance.keyup.call(this, instance, event)
+      }, {
+        key: 'input',
+        value: function input(instance, event) {
+          instance.inputEvent = true;
+          instance.keyup.call(this, instance, event);
         }
-
-        click(instance, event) {
-          let tribute = instance.tribute
+      }, {
+        key: 'click',
+        value: function click(instance, event) {
+          var tribute = instance.tribute;
 
           if (tribute.menu && tribute.menu.contains(event.target)) {
-            let li = event.target
-            tribute.selectItemAtIndex(li.getAttribute('data-index'))
-            tribute.hideMenu()
+            var li = event.target;
+            while (li.nodeName.toLowerCase() !== 'li') {
+              li = li.parentNode;
+              if (!li || li === tribute.menu) {
+                throw new Error('cannot find the <li> container for the click');
+              }
+            }
+            tribute.selectItemAtIndex(li.getAttribute('data-index'));
+            tribute.hideMenu();
           } else if (tribute.current.element) {
-            tribute.hideMenu()
+            tribute.hideMenu();
           }
         }
+      }, {
+        key: 'keyup',
+        value: function keyup(instance, event) {
+          var _this5 = this;
 
-        keyup(instance, event) {
           if (instance.inputEvent) {
-            instance.inputEvent = false
+            instance.inputEvent = false;
           }
-          instance.updateSelection(this)
+          instance.updateSelection(this);
 
-          if (event.keyCode === 27) return
+          if (event.keyCode === 27) return;
 
           if (!instance.tribute.isActive) {
-            let keyCode = instance.getKeyCode(instance, this, event)
+            var _ret2 = function () {
+              var keyCode = instance.getKeyCode(instance, _this5, event);
 
-            if (isNaN(keyCode)) return
+              if (isNaN(keyCode)) return {
+                  v: void 0
+                };
 
-            let trigger = instance.tribute.triggers().find(trigger => {
-              return trigger.charCodeAt(0) === keyCode
-            })
+              var trigger = instance.tribute.triggers().find(function (trigger) {
+                return trigger.charCodeAt(0) === keyCode;
+              });
 
-            if (typeof trigger !== 'undefined') {
-              instance.callbacks().triggerChar(event, this, trigger)
-            }
+              if (typeof trigger !== 'undefined') {
+                instance.callbacks().triggerChar(event, _this5, trigger);
+              }
+            }();
+
+            if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
           }
 
           if (instance.tribute.current.trigger && instance.commandEvent === false) {
-            instance.tribute.showMenuFor(this)
+            instance.tribute.showMenuFor(this);
           }
         }
-
-        shouldDeactivate(event) {
-          if (!this.tribute.isActive) return false
+      }, {
+        key: 'shouldDeactivate',
+        value: function shouldDeactivate(event) {
+          if (!this.tribute.isActive) return false;
 
           if (this.tribute.current.mentionText.length === 0) {
-            let eventKeyPressed = false
-            TributeEvents.keys().forEach(o => {
-              if (event.keyCode === o.key) eventKeyPressed = true
-            })
+            var eventKeyPressed = false;
+            TributeEvents.keys().forEach(function (o) {
+              if (event.keyCode === o.key) eventKeyPressed = true;
+            });
 
-            return !eventKeyPressed
+            return !eventKeyPressed;
           }
 
-          return false
+          return false;
         }
-
-        getKeyCode(instance, el, event) {
-          let char
-          let tribute = instance.tribute
-          let info = tribute.range.getTriggerInfo(false, false, true)
+      }, {
+        key: 'getKeyCode',
+        value: function getKeyCode(instance, el, event) {
+          var char = void 0;
+          var tribute = instance.tribute;
+          var info = tribute.range.getTriggerInfo(false, false, true);
 
           if (info) {
-            return info.mentionTriggerChar.charCodeAt(0)
+            return info.mentionTriggerChar.charCodeAt(0);
           } else {
-            return false
+            return false;
           }
         }
-
-        updateSelection(el) {
-          this.tribute.current.element = el
-          let info = this.tribute.range.getTriggerInfo(false, false, true)
+      }, {
+        key: 'updateSelection',
+        value: function updateSelection(el) {
+          this.tribute.current.element = el;
+          var info = this.tribute.range.getTriggerInfo(false, false, true);
 
           if (info) {
-            this.tribute.current.selectedPath = info.mentionSelectedPath
-            this.tribute.current.mentionText = info.mentionText
-            this.tribute.current.selectedOffset = info.mentionSelectedOffset
+            this.tribute.current.selectedPath = info.mentionSelectedPath;
+            this.tribute.current.mentionText = info.mentionText;
+            this.tribute.current.selectedOffset = info.mentionSelectedOffset;
           }
         }
+      }, {
+        key: 'callbacks',
+        value: function callbacks() {
+          var _this6 = this;
 
-        callbacks() {
           return {
-            triggerChar: (e, el, trigger) => {
-              let tribute = this.tribute
-              tribute.current.trigger = trigger
+            triggerChar: function triggerChar(e, el, trigger) {
+              var tribute = _this6.tribute;
+              tribute.current.trigger = trigger;
 
-              let collectionItem = tribute.collection.find(item => {
-                return item.trigger === trigger
-              })
+              var collectionItem = tribute.collection.find(function (item) {
+                return item.trigger === trigger;
+              });
 
-              tribute.current.collection = collectionItem
+              tribute.current.collection = collectionItem;
 
-              tribute.showMenuFor(el)
+              tribute.showMenuFor(el);
             },
-            enter: (e, el) => {
+            enter: function enter(e, el) {
               // choose selection
-              if (this.tribute.isActive) {
-                e.preventDefault()
-                setTimeout(() => {
-                  this.tribute.selectItemAtIndex(this.tribute.menuSelected)
-                  this.tribute.hideMenu()
-                }, 0)
+              if (_this6.tribute.isActive) {
+                e.preventDefault();
+                setTimeout(function () {
+                  _this6.tribute.selectItemAtIndex(_this6.tribute.menuSelected);
+                  _this6.tribute.hideMenu();
+                }, 0);
               }
             },
-            escape: (e, el) => {
-              if (this.tribute.isActive) {
-                e.preventDefault()
-                this.tribute.hideMenu()
+            escape: function escape(e, el) {
+              if (_this6.tribute.isActive) {
+                e.preventDefault();
+                _this6.tribute.hideMenu();
               }
             },
-            tab: (e, el) => {
+            tab: function tab(e, el) {
               // choose first match
-              this.callbacks().enter(e, el)
+              _this6.callbacks().enter(e, el);
             },
-            up: (e, el) => {
+            up: function up(e, el) {
               // navigate up ul
-              if (this.tribute.isActive) {
-                e.preventDefault()
-                let count = this.tribute.current.filteredItems.length,
-                    selected = this.tribute.menuSelected
+              if (_this6.tribute.isActive) {
+                e.preventDefault();
+                var count = _this6.tribute.current.filteredItems.length,
+                    selected = _this6.tribute.menuSelected;
 
                 if (count > selected && selected > 0) {
-                  this.tribute.menuSelected--
-                  this.setActiveLi()
+                  _this6.tribute.menuSelected--;
+                  _this6.setActiveLi();
                 }
               }
             },
-            down: (e, el) => {
+            down: function down(e, el) {
               // navigate down ul
-              if (this.tribute.isActive) {
-                e.preventDefault()
-                let count = this.tribute.current.filteredItems.length - 1,
-                    selected = this.tribute.menuSelected
+              if (_this6.tribute.isActive) {
+                e.preventDefault();
+                var count = _this6.tribute.current.filteredItems.length - 1,
+                    selected = _this6.tribute.menuSelected;
 
                 if (count > selected) {
-                  this.tribute.menuSelected++
-                  this.setActiveLi()
+                  _this6.tribute.menuSelected++;
+                  _this6.setActiveLi();
                 }
               }
             }
-          }
+          };
         }
+      }, {
+        key: 'setActiveLi',
+        value: function setActiveLi(index) {
+          var lis = this.tribute.menu.querySelectorAll('li'),
+              length = lis.length >>> 0;
 
-        setActiveLi(index) {
-          let lis = this.tribute.menu.querySelectorAll('li'),
-              length = lis.length >>> 0
-
-          for (let i = 0; i < length; i++) {
-            let li = lis[i]
+          for (var i = 0; i < length; i++) {
+            var li = lis[i];
             if (i === this.tribute.menuSelected) {
-              li.className = this.tribute.current.collection.selectClass
+              li.className = this.tribute.current.collection.selectClass;
             } else {
-              li.className = ''
+              li.className = '';
             }
           }
         }
+      }], [{
+        key: 'keys',
+        value: function keys() {
+          return [{ key: 9, value: 'TAB' }, { key: 13, value: 'ENTER' }, { key: 27, value: 'ESCAPE' }, { key: 38, value: 'UP' }, { key: 40, value: 'DOWN' }];
+        }
+      }]);
 
+      return TributeEvents;
+    }();
+
+    // Thanks to https://github.com/jeff-collins/ment.io
+
+
+    var TributeRange = function () {
+      function TributeRange(tribute) {
+        _classCallCheck(this, TributeRange);
+
+        this.tribute = tribute;
+        this.tribute.range = this;
       }
 
-      // Thanks to https://github.com/jeff-collins/ment.io
-      class TributeRange {
-        constructor(tribute) {
-          this.tribute = tribute
-          this.tribute.range = this
-        }
-
-        getDocument() {
-          let iframe
+      _createClass(TributeRange, [{
+        key: 'getDocument',
+        value: function getDocument() {
+          var iframe = void 0;
           if (this.tribute.current.collection) {
-            iframe = this.tribute.current.collection.iframe
+            iframe = this.tribute.current.collection.iframe;
           }
 
           if (!iframe) {
-            return document
+            return document;
           }
 
-          return iframe.contentWindow.document
+          return iframe.contentWindow.document;
         }
+      }, {
+        key: 'positionMenuAtCaret',
+        value: function positionMenuAtCaret() {
+          var _this7 = this;
 
-        positionMenuAtCaret() {
-          let context = this.tribute.current, coordinates
-          let info = this.getTriggerInfo(false, false, true)
+          var context = this.tribute.current,
+              coordinates = void 0;
+          var info = this.getTriggerInfo(false, false, true);
 
           if (info !== undefined) {
             if (!this.isContentEditable(context.element)) {
-              coordinates = this.getTextAreaOrInputUnderlinePosition(this.getDocument().activeElement,
-                info.mentionPosition)
+              coordinates = this.getTextAreaOrInputUnderlinePosition(this.getDocument().activeElement, info.mentionPosition);
             } else {
-              coordinates = this.getContentEditableCaretPosition(info.mentionPosition)
+              coordinates = this.getContentEditableCaretPosition(info.mentionPosition);
             }
 
-            // Move the button into place.
-            this.tribute.menu.style.cssText = `top: ${$('#id_messageeditable').offset().top+24}px;
-                                               left: ${coordinates.left}px;
-                                               position: absolute;
-                                               zIndex: 10000;
-                                               display: block;`
+            var topposition = $('#id_messageeditable').offset().top+24
 
-            setTimeout(() => {
-              this.scrollIntoView(this.getDocument().activeElement)
-            }, 0)
+            // Move the button into place.
+            this.tribute.menu.style.cssText = 'top: ' + topposition + 'px;\n                                           left: ' + coordinates.left + 'px;\n                                           position: absolute;\n                                           zIndex: 10000;\n                                           display: block;';
+
+            setTimeout(function () {
+              _this7.scrollIntoView(_this7.getDocument().activeElement);
+            }, 0);
           } else {
-            this.tribute.menu.style.cssText = 'display: none'
+            this.tribute.menu.style.cssText = 'display: none';
           }
         }
-
-        selectElement(targetElement, path, offset) {
-          let range
-          let elem = targetElement
+      }, {
+        key: 'selectElement',
+        value: function selectElement(targetElement, path, offset) {
+          var range = void 0;
+          var elem = targetElement;
 
           if (path) {
             for (var i = 0; i < path.length; i++) {
-              elem = elem.childNodes[path[i]]
+              elem = elem.childNodes[path[i]];
               if (elem === undefined) {
-                return
+                return;
               }
               while (elem.length < offset) {
-                offset -= elem.length
-                elem = elem.nextSibling
+                offset -= elem.length;
+                elem = elem.nextSibling;
               }
               if (elem.childNodes.length === 0 && !elem.length) {
-                elem = elem.previousSibling
+                elem = elem.previousSibling;
               }
             }
           }
-          let sel = this.getWindowSelection()
+          var sel = this.getWindowSelection();
 
-          range = this.getDocument().createRange()
-          range.setStart(elem, offset)
-          range.setEnd(elem, offset)
-          range.collapse(true)
+          range = this.getDocument().createRange();
+          range.setStart(elem, offset);
+          range.setEnd(elem, offset);
+          range.collapse(true);
 
           try {
-            sel.removeAllRanges()
+            sel.removeAllRanges();
           } catch (error) {}
 
-          sel.addRange(range)
-          targetElement.focus()
+          sel.addRange(range);
+          targetElement.focus();
         }
-
-        resetSelection(targetElement, path, offset) {
+      }, {
+        key: 'resetSelection',
+        value: function resetSelection(targetElement, path, offset) {
           if (!this.isContentEditable(targetElement)) {
             if (targetElement !== this.getDocument().activeElement) {
-              targetElement.focus()
+              targetElement.focus();
             }
           } else {
-            this.selectElement(targetElement, path, offset)
+            this.selectElement(targetElement, path, offset);
           }
         }
+      }, {
+        key: 'replaceTriggerText',
+        value: function replaceTriggerText(text, requireLeadingSpace, hasTrailingSpace) {
+          var context = this.tribute.current;
+          this.resetSelection(context.element, context.selectedPath, context.selectedOffset);
 
-        replaceTriggerText(text, requireLeadingSpace, hasTrailingSpace) {
-          let context = this.tribute.current
-          this.resetSelection(context.element, context.selectedPath, context.selectedOffset)
+          var info = this.getTriggerInfo(requireLeadingSpace, true, hasTrailingSpace);
 
-          let info = this.getTriggerInfo(requireLeadingSpace, true, hasTrailingSpace)
+          // Create the event
+          var replaceEvent = new CustomEvent('tribute-replaced', { detail: text });
 
           if (info !== undefined) {
             if (!this.isContentEditable(context.element)) {
-              let myField = this.getDocument().activeElement
-              text += ' '
-              let startPos = info.mentionPosition
-              let endPos = info.mentionPosition + info.mentionText.length + 1
-              myField.value = myField.value.substring(0, startPos) + text +
-                myField.value.substring(endPos, myField.value.length)
-              myField.selectionStart = startPos + text.length
-              myField.selectionEnd = startPos + text.length
+              var myField = this.getDocument().activeElement;
+              text += ' ';
+              var startPos = info.mentionPosition;
+              var endPos = info.mentionPosition + info.mentionText.length + 1;
+              myField.value = myField.value.substring(0, startPos) + text + myField.value.substring(endPos, myField.value.length);
+              myField.selectionStart = startPos + text.length;
+              myField.selectionEnd = startPos + text.length;
             } else {
               // add a space to the end of the pasted text
-              text += '\xA0'
-              this.pasteHtml(text, info.mentionPosition,
-                info.mentionPosition + info.mentionText.length + 1)
+              text += '\xA0';
+              this.pasteHtml(text, info.mentionPosition, info.mentionPosition + info.mentionText.length + 1);
             }
+
+            context.element.dispatchEvent(replaceEvent);
           }
         }
+      }, {
+        key: 'pasteHtml',
+        value: function pasteHtml(html, startPos, endPos) {
+          var range = void 0,
+              sel = void 0;
+          sel = this.getWindowSelection();
+          range = this.getDocument().createRange();
+          range.setStart(sel.anchorNode, startPos);
+          range.setEnd(sel.anchorNode, endPos);
+          range.deleteContents();
 
-        pasteHtml(html, startPos, endPos) {
-          let range, sel
-          sel = this.getWindowSelection()
-          range = this.getDocument().createRange()
-          range.setStart(sel.anchorNode, startPos)
-          range.setEnd(sel.anchorNode, endPos)
-          range.deleteContents()
-
-          let el = this.getDocument().createElement('div')
-          el.innerHTML = html
-          let frag = this.getDocument().createDocumentFragment(), node, lastNode
-          while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node)
+          var el = this.getDocument().createElement('div');
+          el.innerHTML = html;
+          var frag = this.getDocument().createDocumentFragment(),
+              node = void 0,
+              lastNode = void 0;
+          while (node = el.firstChild) {
+            lastNode = frag.appendChild(node);
           }
-          range.insertNode(frag)
+          range.insertNode(frag);
 
           // Preserve the selection
           if (lastNode) {
-            range = range.cloneRange()
-            range.setStartAfter(lastNode)
-            range.collapse(true)
-            sel.removeAllRanges()
-            sel.addRange(range)
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
           }
         }
-
-        getWindowSelection() {
+      }, {
+        key: 'getWindowSelection',
+        value: function getWindowSelection() {
           if (this.tribute.collection.iframe) {
             return this.tribute.collection.iframe.contentWindow.getSelection();
           }
 
-          return window.getSelection()
+          return window.getSelection();
         }
-
-        getNodePositionInParent(element) {
+      }, {
+        key: 'getNodePositionInParent',
+        value: function getNodePositionInParent(element) {
           if (element.parentNode === null) {
-            return 0
+            return 0;
           }
 
           for (var i = 0; i < element.parentNode.childNodes.length; i++) {
-            let node = element.parentNode.childNodes[i]
+            var node = element.parentNode.childNodes[i];
 
             if (node === element) {
-              return i
+              return i;
             }
           }
         }
-
-        getContentEditableSelectedPath() {
+      }, {
+        key: 'getContentEditableSelectedPath',
+        value: function getContentEditableSelectedPath() {
           // content editable
-          let sel = this.getWindowSelection()
-          let selected = sel.anchorNode
-          let path = []
-          let offset
+          var sel = this.getWindowSelection();
+          var selected = sel.anchorNode;
+          var path = [];
+          var offset = void 0;
 
           if (selected != null) {
-            let i
-            let ce = selected.contentEditable
+            var i = void 0;
+            var ce = selected.contentEditable;
             while (selected !== null && ce !== 'true') {
-              i = this.getNodePositionInParent(selected)
-              path.push(i)
-              selected = selected.parentNode
+              i = this.getNodePositionInParent(selected);
+              path.push(i);
+              selected = selected.parentNode;
               if (selected !== null) {
-                ce = selected.contentEditable
+                ce = selected.contentEditable;
               }
             }
-            path.reverse()
+            path.reverse();
 
             // getRangeAt may not exist, need alternative
-            offset = sel.getRangeAt(0).startOffset
+            offset = sel.getRangeAt(0).startOffset;
 
             return {
               selected: selected,
               path: path,
               offset: offset
-            }
+            };
           }
         }
-
-        getTextPrecedingCurrentSelection() {
-          let context = this.tribute.current, text
+      }, {
+        key: 'getTextPrecedingCurrentSelection',
+        value: function getTextPrecedingCurrentSelection() {
+          var context = this.tribute.current,
+              text = void 0;
 
           if (!this.isContentEditable(context.element)) {
-            let textComponent = this.getDocument().activeElement
-            let startPos = textComponent.selectionStart
-            text = textComponent.value.substring(0, startPos)
-
+            var textComponent = this.getDocument().activeElement;
+            var startPos = textComponent.selectionStart;
+            text = textComponent.value.substring(0, startPos);
           } else {
-            let selectedElem = this.getWindowSelection().anchorNode
+            var selectedElem = this.getWindowSelection().anchorNode;
 
             if (selectedElem != null) {
-              let workingNodeContent = selectedElem.textContent
-              let selectStartOffset = this.getWindowSelection().getRangeAt(0).startOffset
+              var workingNodeContent = selectedElem.textContent;
+              var selectStartOffset = this.getWindowSelection().getRangeAt(0).startOffset;
 
               if (selectStartOffset >= 0) {
-                text = workingNodeContent.substring(0, selectStartOffset)
+                text = workingNodeContent.substring(0, selectStartOffset);
               }
             }
           }
 
-          return text
+          return text;
         }
+      }, {
+        key: 'getTriggerInfo',
+        value: function getTriggerInfo(menuAlreadyActive, hasTrailingSpace, requireLeadingSpace) {
+          var _this8 = this;
 
-        getTriggerInfo(menuAlreadyActive, hasTrailingSpace, requireLeadingSpace) {
-          let ctx = this.tribute.current
-          let selected, path, offset
+          var ctx = this.tribute.current;
+          var selected = void 0,
+              path = void 0,
+              offset = void 0;
 
           if (!this.isContentEditable(ctx.element)) {
-            selected = this.getDocument().activeElement
+            selected = this.getDocument().activeElement;
           } else {
             // content editable
-            let selectionInfo = this.getContentEditableSelectedPath()
+            var selectionInfo = this.getContentEditableSelectedPath();
 
             if (selectionInfo) {
-              selected = selectionInfo.selected
-              path = selectionInfo.path
-              offset = selectionInfo.offset
+              selected = selectionInfo.selected;
+              path = selectionInfo.path;
+              offset = selectionInfo.offset;
             }
           }
 
-          let effectiveRange = this.getTextPrecedingCurrentSelection()
+          var effectiveRange = this.getTextPrecedingCurrentSelection();
 
           if (effectiveRange !== undefined && effectiveRange !== null) {
-            let mostRecentTriggerCharPos = -1
-            let triggerChar
+            var _ret3 = function () {
+              var mostRecentTriggerCharPos = -1;
+              var triggerChar = void 0;
 
-            this.tribute.triggers().forEach(c => {
-              let idx = effectiveRange.lastIndexOf(c)
+              _this8.tribute.triggers().forEach(function (c) {
+                var idx = effectiveRange.lastIndexOf(c);
 
-              if (idx > mostRecentTriggerCharPos) {
-                mostRecentTriggerCharPos = idx
-                triggerChar = c
-              }
-            })
+                if (idx > mostRecentTriggerCharPos) {
+                  mostRecentTriggerCharPos = idx;
+                  triggerChar = c;
+                }
+              });
 
-            if (mostRecentTriggerCharPos >= 0 &&
-              (
-                mostRecentTriggerCharPos === 0 ||
-                !requireLeadingSpace ||
-                /[\xA0\s]/g.test(
-                  effectiveRange.substring(
-                    mostRecentTriggerCharPos - 1,
-                    mostRecentTriggerCharPos)
-                )
-              )
-            ) {
-              let currentTriggerSnippet = effectiveRange.substring(mostRecentTriggerCharPos + 1,
-                effectiveRange.length)
+              if (mostRecentTriggerCharPos >= 0 && (mostRecentTriggerCharPos === 0 || !requireLeadingSpace || /[\xA0\s]/g.test(effectiveRange.substring(mostRecentTriggerCharPos - 1, mostRecentTriggerCharPos)))) {
+                var currentTriggerSnippet = effectiveRange.substring(mostRecentTriggerCharPos + 1, effectiveRange.length);
 
-              triggerChar = effectiveRange.substring(mostRecentTriggerCharPos, mostRecentTriggerCharPos + 1)
-              let firstSnippetChar = currentTriggerSnippet.substring(0, 1)
-              let leadingSpace = currentTriggerSnippet.length > 0 &&
-                (
-                  firstSnippetChar === ' ' ||
-                  firstSnippetChar === '\xA0'
-                )
-              if (hasTrailingSpace) {
-                currentTriggerSnippet = currentTriggerSnippet.trim()
-              }
-              if (!leadingSpace && (menuAlreadyActive || !(/[\xA0\s]/g.test(currentTriggerSnippet)))) {
-                return {
-                  mentionPosition: mostRecentTriggerCharPos,
-                  mentionText: currentTriggerSnippet,
-                  mentionSelectedElement: selected,
-                  mentionSelectedPath: path,
-                  mentionSelectedOffset: offset,
-                  mentionTriggerChar: triggerChar
+                triggerChar = effectiveRange.substring(mostRecentTriggerCharPos, mostRecentTriggerCharPos + 1);
+                var firstSnippetChar = currentTriggerSnippet.substring(0, 1);
+                var leadingSpace = currentTriggerSnippet.length > 0 && (firstSnippetChar === ' ' || firstSnippetChar === '\xA0');
+                if (hasTrailingSpace) {
+                  currentTriggerSnippet = currentTriggerSnippet.trim();
+                }
+                if (!leadingSpace && (menuAlreadyActive || !/[\xA0\s]/g.test(currentTriggerSnippet))) {
+                  return {
+                    v: {
+                      mentionPosition: mostRecentTriggerCharPos,
+                      mentionText: currentTriggerSnippet,
+                      mentionSelectedElement: selected,
+                      mentionSelectedPath: path,
+                      mentionSelectedOffset: offset,
+                      mentionTriggerChar: triggerChar
+                    }
+                  };
                 }
               }
-            }
+            }();
+
+            if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
           }
         }
-
-        isContentEditable(element) {
-          return element.nodeName !== 'INPUT' && element.nodeName !== 'TEXTAREA'
+      }, {
+        key: 'isContentEditable',
+        value: function isContentEditable(element) {
+          return element.nodeName !== 'INPUT' && element.nodeName !== 'TEXTAREA';
         }
+      }, {
+        key: 'getTextAreaOrInputUnderlinePosition',
+        value: function getTextAreaOrInputUnderlinePosition(element, position) {
+          var properties = ['direction', 'boxSizing', 'width', 'height', 'overflowX', 'overflowY', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch', 'fontSize', 'fontSizeAdjust', 'lineHeight', 'fontFamily', 'textAlign', 'textTransform', 'textIndent', 'textDecoration', 'letterSpacing', 'wordSpacing'];
 
-        getTextAreaOrInputUnderlinePosition(element, position) {
-          let properties = ['direction', 'boxSizing', 'width', 'height', 'overflowX',
-                            'overflowY', 'borderTopWidth', 'borderRightWidth',
-                            'borderBottomWidth', 'borderLeftWidth', 'paddingTop',
-                            'paddingRight', 'paddingBottom', 'paddingLeft',
-                            'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch',
-                            'fontSize', 'fontSizeAdjust', 'lineHeight', 'fontFamily',
-                            'textAlign', 'textTransform', 'textIndent',
-                            'textDecoration', 'letterSpacing', 'wordSpacing']
+          var isFirefox = window.mozInnerScreenX !== null;
 
-          let isFirefox = (window.mozInnerScreenX !== null)
+          var div = this.getDocument().createElement('div');
+          div.id = 'input-textarea-caret-position-mirror-div';
+          this.getDocument().body.appendChild(div);
 
-          let div = this.getDocument().createElement('div')
-          div.id = 'input-textarea-caret-position-mirror-div'
-          this.getDocument().body.appendChild(div)
+          var style = div.style;
+          var computed = window.getComputedStyle ? getComputedStyle(element) : element.currentStyle;
 
-          let style = div.style
-          let computed = window.getComputedStyle ? getComputedStyle(element) : element.currentStyle
-
-          style.whiteSpace = 'pre-wrap'
+          style.whiteSpace = 'pre-wrap';
           if (element.nodeName !== 'INPUT') {
-            style.wordWrap = 'break-word'
+            style.wordWrap = 'break-word';
           }
 
           // position off-screen
-          style.position = 'absolute'
-          style.visibility = 'hidden'
+          style.position = 'absolute';
+          style.visibility = 'hidden';
 
           // transfer the element's properties to the div
-          properties.forEach(prop => {
-            style[prop] = computed[prop]
-          })
+          properties.forEach(function (prop) {
+            style[prop] = computed[prop];
+          });
 
           if (isFirefox) {
-            style.width = `${(parseInt(computed.width) - 2)}px`
-            if (element.scrollHeight > parseInt(computed.height))
-              style.overflowY = 'scroll'
+            style.width = parseInt(computed.width) - 2 + 'px';
+            if (element.scrollHeight > parseInt(computed.height)) style.overflowY = 'scroll';
           } else {
-            style.overflow = 'hidden'
+            style.overflow = 'hidden';
           }
 
-          div.textContent = element.value.substring(0, position)
+          div.textContent = element.value.substring(0, position);
 
           if (element.nodeName === 'INPUT') {
-            div.textContent = div.textContent.replace(/\s/g, '\u00a0')
+            div.textContent = div.textContent.replace(/\s/g, ' ');
           }
 
-          let span = this.getDocument().createElement('span')
-          span.textContent = element.value.substring(position) || '.'
-          div.appendChild(span)
+          var span = this.getDocument().createElement('span');
+          span.textContent = element.value.substring(position) || '.';
+          div.appendChild(span);
 
-          let rect = element.getBoundingClientRect()
-          var doc = document.documentElement
-          var windowLeft = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0)
-          var windowTop = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0)
-          let coordinates = {
+          var rect = element.getBoundingClientRect();
+          var doc = document.documentElement;
+          var windowLeft = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+          var windowTop = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
+          var coordinates = {
             top: rect.top + windowTop + span.offsetTop + parseInt(computed.borderTopWidth) + parseInt(computed.fontSize),
             left: rect.left + windowLeft + span.offsetLeft + parseInt(computed.borderLeftWidth)
-          }
+          };
 
-          this.getDocument().body.removeChild(div)
+          this.getDocument().body.removeChild(div);
 
-          return coordinates
+          return coordinates;
         }
+      }, {
+        key: 'getContentEditableCaretPosition',
+        value: function getContentEditableCaretPosition(selectedNodePosition) {
+          var markerTextChar = '﻿';
+          var markerEl = void 0,
+              markerId = 'sel_' + new Date().getTime() + '_' + Math.random().toString().substr(2);
+          var range = void 0;
+          var sel = this.getWindowSelection();
+          var prevRange = sel.getRangeAt(0);
 
-        getContentEditableCaretPosition(selectedNodePosition) {
-          let markerTextChar = '\ufeff'
-          let markerEl, markerId = `sel_${new Date().getTime()}_${Math.random().toString().substr(2)}`
-          let range
-          let sel = this.getWindowSelection()
-          let prevRange = sel.getRangeAt(0)
+          range = this.getDocument().createRange();
+          range.setStart(sel.anchorNode, selectedNodePosition);
+          range.setEnd(sel.anchorNode, selectedNodePosition);
 
-          range = this.getDocument().createRange()
-          range.setStart(sel.anchorNode, selectedNodePosition)
-          range.setEnd(sel.anchorNode, selectedNodePosition)
-
-          range.collapse(false)
+          range.collapse(false);
 
           // Create the marker element containing a single invisible character using DOM methods and insert it
-          markerEl = this.getDocument().createElement('span')
-          markerEl.id = markerId
-          markerEl.appendChild(this.getDocument().createTextNode(markerTextChar))
-          range.insertNode(markerEl)
-          sel.removeAllRanges()
-          sel.addRange(prevRange)
+          markerEl = this.getDocument().createElement('span');
+          markerEl.id = markerId;
+          markerEl.appendChild(this.getDocument().createTextNode(markerTextChar));
+          range.insertNode(markerEl);
+          sel.removeAllRanges();
+          sel.addRange(prevRange);
 
-          let rect = markerEl.getBoundingClientRect()
-          let coordinates = {
+          var rect = markerEl.getBoundingClientRect();
+          var coordinates = {
             left: rect.left,
             top: rect.top + markerEl.offsetHeight
-          }
+          };
 
-          markerEl.parentNode.removeChild(markerEl)
-          return coordinates
+          markerEl.parentNode.removeChild(markerEl);
+          return coordinates;
         }
-
-        scrollIntoView(elem) {
-          let reasonableBuffer = 20, clientRect
-          let maxScrollDisplacement = 100
-          let e = elem
+      }, {
+        key: 'scrollIntoView',
+        value: function scrollIntoView(elem) {
+          var reasonableBuffer = 20,
+              clientRect = void 0;
+          var maxScrollDisplacement = 100;
+          var e = elem;
 
           while (clientRect === undefined || clientRect.height === 0) {
-            clientRect = e.getBoundingClientRect()
+            clientRect = e.getBoundingClientRect();
 
             if (clientRect.height === 0) {
-              e = e.childNodes[0]
+              e = e.childNodes[0];
               if (e === undefined || !e.getBoundingClientRect) {
-                return
+                return;
               }
             }
           }
 
-          let elemTop = clientRect.top
-          let elemBottom = elemTop + clientRect.height
+          var elemTop = clientRect.top;
+          var elemBottom = elemTop + clientRect.height;
 
           if (elemTop < 0) {
-            window.scrollTo(0, window.pageYOffset + clientRect.top - reasonableBuffer)
+            window.scrollTo(0, window.pageYOffset + clientRect.top - reasonableBuffer);
           } else if (elemBottom > window.innerHeight) {
-            let maxY = window.pageYOffset + clientRect.top - reasonableBuffer
+            var maxY = window.pageYOffset + clientRect.top - reasonableBuffer;
 
             if (maxY - window.pageYOffset > maxScrollDisplacement) {
-              maxY = window.pageYOffset + maxScrollDisplacement
+              maxY = window.pageYOffset + maxScrollDisplacement;
             }
 
-            let targetY = window.pageYOffset - (window.innerHeight - elemBottom)
+            var targetY = window.pageYOffset - (window.innerHeight - elemBottom);
 
             if (targetY > maxY) {
-              targetY = maxY
+              targetY = maxY;
             }
 
-            // window.scrollTo(0, targetY)
+           // window.scrollTo(0, targetY);
           }
         }
+      }]);
+
+      return TributeRange;
+    }();
+
+    // Thanks to https://github.com/mattyork/fuzzy
+
+
+    var TributeSearch = function () {
+      function TributeSearch(tribute) {
+        _classCallCheck(this, TributeSearch);
+
+        this.tribute = tribute;
+        this.tribute.search = this;
       }
 
-      // Thanks to https://github.com/mattyork/fuzzy
-      class TributeSearch {
-        constructor(tribute) {
-          this.tribute = tribute
-          this.tribute.search = this
-        }
+      _createClass(TributeSearch, [{
+        key: 'simpleFilter',
+        value: function simpleFilter(pattern, array) {
+          var _this9 = this;
 
-        simpleFilter(pattern, array) {
-          return array.filter(string => {
-            return this.test(pattern, string)
-          })
+          return array.filter(function (string) {
+            return _this9.test(pattern, string);
+          });
         }
-
-        test(pattern, string) {
-          return this.match(pattern, string) !== null
+      }, {
+        key: 'test',
+        value: function test(pattern, string) {
+          return this.match(pattern, string) !== null;
         }
-
-        match(pattern, string, opts) {
-          opts = opts || {}
-          let patternIdx = 0,
+      }, {
+        key: 'match',
+        value: function match(pattern, string, opts) {
+          opts = opts || {};
+          var patternIdx = 0,
               result = [],
               len = string.length,
               totalScore = 0,
@@ -914,22 +1041,24 @@ define(["jquery"], function(jQuery) {
               pre = opts.pre || '',
               post = opts.post || '',
               compareString = opts.caseSensitive && string || string.toLowerCase(),
-              ch, compareChar
+              ch = void 0,
+              compareChar = void 0;
 
-          pattern = opts.caseSensitive && pattern || pattern.toLowerCase()
+          pattern = opts.caseSensitive && pattern || pattern.toLowerCase();
 
-          let patternCache = this.traverse(compareString, pattern, 0, 0, [])
+          var patternCache = this.traverse(compareString, pattern, 0, 0, []);
           if (!patternCache) {
-            return null
+            return null;
           }
 
           return {
             rendered: this.render(string, patternCache.cache, pre, post),
             score: patternCache.score
-          }
+          };
         }
-
-        traverse(string, pattern, stringIndex, patternIndex, patternCache) {
+      }, {
+        key: 'traverse',
+        value: function traverse(string, pattern, stringIndex, patternIndex, patternCache) {
           // if the pattern search at end
           if (pattern.length === patternIndex) {
 
@@ -937,110 +1066,115 @@ define(["jquery"], function(jQuery) {
             return {
               score: this.calculateScore(patternCache),
               cache: patternCache.slice()
-            }
+            };
           }
 
           // if string at end or remaining pattern > remaining string
           if (string.length === stringIndex || pattern.length - patternIndex > string.length - stringIndex) {
-            return undefined
+            return undefined;
           }
 
-          let c = pattern[patternIndex]
-          let index = string.indexOf(c, stringIndex)
-          let best, temp
+          var c = pattern[patternIndex];
+          var index = string.indexOf(c, stringIndex);
+          var best = void 0,
+              temp = void 0;
 
           while (index > -1) {
-            patternCache.push(index)
-            temp = this.traverse(string, pattern, index + 1, patternIndex + 1, patternCache)
-            patternCache.pop()
+            patternCache.push(index);
+            temp = this.traverse(string, pattern, index + 1, patternIndex + 1, patternCache);
+            patternCache.pop();
 
             // if downstream traversal failed, return best answer so far
             if (!temp) {
-              return best
+              return best;
             }
 
             if (!best || best.score < temp.score) {
-              best = temp
+              best = temp;
             }
 
-            index = string.indexOf(c, index + 1)
+            index = string.indexOf(c, index + 1);
           }
 
-          return best
+          return best;
         }
+      }, {
+        key: 'calculateScore',
+        value: function calculateScore(patternCache) {
+          var score = 0;
+          var temp = 1;
 
-        calculateScore(patternCache) {
-          let score = 0
-          let temp = 1
-
-          patternCache.forEach((index, i) => {
+          patternCache.forEach(function (index, i) {
             if (i > 0) {
               if (patternCache[i - 1] + 1 === index) {
-                temp += temp + 1
+                temp += temp + 1;
               } else {
-                temp = 1
+                temp = 1;
               }
             }
 
-            score += temp
-          })
+            score += temp;
+          });
 
-          return score
+          return score;
         }
+      }, {
+        key: 'render',
+        value: function render(string, indices, pre, post) {
+          var rendered = string.substring(0, indices[0]);
 
-        render(string, indices, pre, post) {
-          var rendered = string.substring(0, indices[0])
+          indices.forEach(function (index, i) {
+            rendered += pre + string[index] + post + string.substring(index + 1, indices[i + 1] ? indices[i + 1] : string.length);
+          });
 
-          indices.forEach((index, i) => {
-            rendered += pre + string[index] + post +
-              string.substring(index + 1, (indices[i + 1]) ? indices[i + 1] : string.length)
-          })
-
-          return rendered
+          return rendered;
         }
+      }, {
+        key: 'filter',
+        value: function filter(pattern, arr, opts) {
+          var _this10 = this;
 
-        filter(pattern, arr, opts) {
-          opts = opts || {}
-          return arr
-            .reduce((prev, element, idx, arr) => {
-              let str = element
+          opts = opts || {};
+          return arr.reduce(function (prev, element, idx, arr) {
+            var str = element;
 
-              if (opts.extract) {
-                str = opts.extract(element)
+            if (opts.extract) {
+              str = opts.extract(element);
 
-                if (!str) { // take care of undefineds / nulls / etc.
-                  str = ''
-                }
+              if (!str) {
+                // take care of undefineds / nulls / etc.
+                str = '';
               }
+            }
 
-              let rendered = this.match(pattern, str, opts)
+            var rendered = _this10.match(pattern, str, opts);
 
-              if (rendered != null) {
-                prev[prev.length] = {
-                  string: rendered.rendered,
-                  score: rendered.score,
-                  index: idx,
-                  original: element
-                }
-              }
+            if (rendered != null) {
+              prev[prev.length] = {
+                string: rendered.rendered,
+                score: rendered.score,
+                index: idx,
+                original: element
+              };
+            }
 
-              return prev
-            }, [])
-
-          .sort((a, b) => {
-            let compare = b.score - a.score
-            if (compare) return compare
-            return a.index - b.index
-          })
+            return prev;
+          }, []).sort(function (a, b) {
+            var compare = b.score - a.score;
+            if (compare) return compare;
+            return a.index - b.index;
+          });
         }
-      }
+      }]);
 
+      return TributeSearch;
+    }();
 
-      if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-        module.exports = Tribute
-      } else {
-        window.Tribute = Tribute
-      }
-
+    if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+      module.exports = Tribute;
+    } else {
+      window.Tribute = Tribute;
     }
-});
+  })();
+}
+ });
