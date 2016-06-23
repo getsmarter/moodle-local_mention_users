@@ -25,10 +25,6 @@
 //Define an array of event handlers
 $observers = array (
     array (
-        'eventname'     => '*',
-        'callback'      => 'process_moodle_event',
-        'includefile'   => '/local/segment/lib.php',
-    ),array(
         'eventname' => '\mod_forum\event\assessable_uploaded',
         'callback'  => 'local_mention_users_observer::email_mention',
     )
