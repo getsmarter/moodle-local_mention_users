@@ -55,9 +55,9 @@ if(isloggedin()) {
 		}
 
 		$post = json_encode($data);
-		$proba = json_encode($data, JSON_FORCE_OBJECT);
 
 		$result->result = true;
+		$result->courseid = $course_id;
 		$result->content = $post;
 	}
 	else {

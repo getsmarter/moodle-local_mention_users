@@ -41,7 +41,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
         success: function(json) {
 
           if (json.result) {
-            populateTributeArray(json.content);
+            populateTributeArray(json.content, json.courseid);
           } else {
             window.alert(json.content);
           }
@@ -50,9 +50,8 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       });
     }
 
-    function populateTributeArray(content) {
+    function populateTributeArray(content, courseid) {
       var data = JSON.parse(content);
-
       var users_array = [];
 
       for (i = 0; i < data.length; i += 2) {
@@ -65,7 +64,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       var tribute = new Tribute({
         collection: [{
           selectTemplate: function(item) {
-            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/profile.php?id=' + item.original.value + ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
+            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + item.original.value + '&course=' + courseid + ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
           },
           values: users_array
         }]
