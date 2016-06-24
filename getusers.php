@@ -37,11 +37,11 @@ if(isloggedin()) {
 				u.lastname,
 				u.username,
 				r.shortname
-			FROM gs.mdl_user_enrolments ue
-			JOIN gs.mdl_enrol e ON (e.id = ue.enrolid)
-			JOIN gs.mdl_user u ON (ue.userid = u.id)
-			JOIN gs.mdl_role_assignments ra ON (u.id = ra.userid)
-			JOIN gs.mdl_role r ON (ra.roleid = r.id)
+			FROM {user_enrolments} ue
+			JOIN {enrol} e ON (e.id = ue.enrolid)
+			JOIN {user} u ON (ue.userid = u.id)
+			JOIN {role_assignments} ra ON (u.id = ra.userid)
+			JOIN {role} r ON (ra.roleid = r.id)
 			WHERE e.courseid = ?
 			AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
 			ORDER BY firstname
