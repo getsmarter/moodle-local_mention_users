@@ -33,7 +33,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
 
     var reply_id = $('input[name=reply]').val();
 
-    function getActions(replyId) {
+    function getUsers(replyId) {
       $.ajax({
         dataType: "json",
         url: '/local/mention_users/getusers.php',
@@ -62,15 +62,9 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
         });
       }
 
-      // var tribute = new Tribute({
-      //   values: users_array
-      // })
-
       var tribute = new Tribute({
         collection: [{
           selectTemplate: function(item) {
-            // return '@' + item.original.key;
-            // return '<span contenteditable="false"><a href="http://zurb.com" target="_blank" title="' + item.original.email + '">' + item.original.key + '</a></span>';
             return '<span contenteditable="false"><a href=' + window.location.origin + '/user/profile.php?id=' + item.original.value + ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
           },
           values: users_array
@@ -80,10 +74,9 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       $(document).ready(function() {
         tribute.attach(document.getElementById('id_messageeditable'));
       });
-    console.log(tribute);
     }
 
-    getActions(reply_id);
+    getUsers(reply_id);
   };
   return module;
 });
