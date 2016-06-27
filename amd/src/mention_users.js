@@ -32,12 +32,13 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
   module.init = function() {
 
     var reply_id = $('input[name=reply]').val();
+    var forum_id = $('input[name=forum]').val();
 
-    function getUsers(replyId) {
+    function getUsers(replyId,forumId) {
       $.ajax({
         dataType: "json",
         url: '/local/mention_users/getusers.php',
-        data: 'action=tribute' + '&reply=' + replyId,
+        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId,
         success: function(json) {
 
           if (json.result) {
@@ -75,7 +76,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       });
     }
 
-    getUsers(reply_id);
+    getUsers(reply_id, forum_id);
   };
   return module;
 });
