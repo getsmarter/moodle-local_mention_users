@@ -4,9 +4,9 @@
  * Forum Actions
  * Adds one action to the database
  *
- * @package   forum_actions
- * @copyright 2014 Moodle Pty Ltd (http://moodle.com)
- * @author    Mikhail Janowski <mikhail@getsmarter.co.za>
+ * @package   mention_users
+ * @copyright 2016
+ * @author    Norbert Ritter
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -14,7 +14,8 @@ require('../../config.php');
 require_once($CFG->dirroot.'/local/mention_users/lib.php');
 
 $action = required_param('action', PARAM_TEXT); // Action
-$reply_id = required_param('reply', PARAM_INT); // Reply ID
+$reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
+$forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
 
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
@@ -26,8 +27,12 @@ if(isloggedin()) {
 	if($action == 'tribute') {
 
 		global $DB;
-		$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
-		$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
+		if ($reply_id != 0 && $forum_id == 0) {
+			$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
+			$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
+		} elseif ($forum_id != 0 && $reply_id == 0) {
+			$course_id = $DB->get_field('forum', "course", array("id"=>$forum_id));
+		}
 
 		$sql = "
 			SELECT DISTINCT
