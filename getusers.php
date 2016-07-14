@@ -16,6 +16,8 @@ require_once($CFG->dirroot.'/local/mention_users/lib.php');
 $action = required_param('action', PARAM_TEXT); // Action
 $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
+$group_id = optional_param('group', 0, PARAM_INT); // Group ID
+
 
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
@@ -34,25 +36,50 @@ if(isloggedin()) {
 			$course_id = $DB->get_field('forum', "course", array("id"=>$forum_id));
 		}
 
-		$sql = "
-			SELECT DISTINCT
-				ue.userid,
-				e.courseid,
-				u.firstname,
-				u.lastname,
-				u.username,
-				r.shortname
-			FROM {user_enrolments} ue
-			JOIN {enrol} e ON (e.id = ue.enrolid)
-			JOIN {user} u ON (ue.userid = u.id)
-			JOIN {role_assignments} ra ON (u.id = ra.userid)
-			JOIN {role} r ON (ra.roleid = r.id)
-			WHERE e.courseid = ?
-			AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
-			ORDER BY firstname
-			;";
+		if ($group_id == 0) {
+			$sql = "
+				SELECT DISTINCT
+					ue.userid,
+					e.courseid,
+					u.firstname,
+					u.lastname,
+					u.username,
+					r.shortname
+				FROM {user_enrolments} ue
+				JOIN {enrol} e ON (e.id = ue.enrolid)
+				JOIN {user} u ON (ue.userid = u.id)
+				JOIN {role_assignments} ra ON (u.id = ra.userid)
+				JOIN {role} r ON (ra.roleid = r.id)
+				WHERE e.courseid = ?
+				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				ORDER BY firstname
+				;";
 
-		$users = $DB->get_records_sql($sql, array($course_id));
+			$users = $DB->get_records_sql($sql, array($course_id));
+		} elseif ($group_id != 0) {
+			$sql = "
+				SELECT DISTINCT
+					ue.userid,
+					e.courseid,
+					u.firstname,
+					u.lastname,
+					u.username,
+					r.shortname
+				FROM {user_enrolments} ue
+				JOIN {enrol} e ON (e.id = ue.enrolid)
+				JOIN {user} u ON (ue.userid = u.id)
+				JOIN {role_assignments} ra ON (u.id = ra.userid)
+				JOIN {role} r ON (ra.roleid = r.id)
+				JOIN {groups} g ON (g.courseid = e.courseid)
+				JOIN {groups_members} gm ON (ue.userid = gm.userid ) AND (gm.groupid = g.id)
+				WHERE e.courseid = ?
+				AND g.id = ?
+				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				ORDER BY firstname
+				;";
+
+			$users = $DB->get_records_sql($sql, array($course_id, $group_id));
+		}
 
 		$data = array();
 		foreach ($users as $user) {
