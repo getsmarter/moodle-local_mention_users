@@ -40,7 +40,6 @@ if(isloggedin()) {
 		$restrictions = json_decode($availability)->c;
 
 		foreach ($restrictions as $restriction) {
-			error_log(print_r($restriction,1));
 			if ($restriction->type == 'group') {
 				$group_id = $restriction->id;
 			} elseif ($restriction->type == 'grouping') {
