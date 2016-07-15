@@ -32,11 +32,24 @@ if(isloggedin()) {
 		if ($reply_id != 0 && $forum_id == 0) {
 			$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
 			$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
+			$forum_id = $DB->get_field('forum_discussions', "forum", array("id"=>$forum_discussions_id));
 		} elseif ($forum_id != 0 && $reply_id == 0) {
 			$course_id = $DB->get_field('forum', "course", array("id"=>$forum_id));
 		}
 
-		if ($group_id == 0) {
+		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id));
+		$restrictions = json_decode($availability)->c;
+
+		foreach ($restrictions as $restriction) {
+			error_log(print_r($restriction,1));
+			if ($restriction->type == 'group') {
+				$group_id = $restriction->id;
+			} elseif ($restriction->type == 'grouping') {
+				$grouping_id = $restriction->id;
+			}
+		}
+
+		if ($group_id == 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
@@ -56,7 +69,7 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id));
-		} elseif ($group_id != 0) {
+		} elseif ($group_id != 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
@@ -79,6 +92,29 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id, $group_id));
+		} elseif ($grouping_id != 0 && $group_id == 0) {
+			$sql = "
+				SELECT DISTINCT
+					ue.userid,
+					e.courseid,
+					u.firstname,
+					u.lastname,
+					u.username,
+					r.shortname
+				FROM {user_enrolments} ue
+				JOIN {enrol} e ON (e.id = ue.enrolid)
+				JOIN {user} u ON (ue.userid = u.id)
+				JOIN {role_assignments} ra ON (u.id = ra.userid)
+				JOIN {role} r ON (ra.roleid = r.id)
+				JOIN {groups_members} gm ON (u.id = gm.userid)
+				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
+				WHERE e.courseid = ?
+				AND gg.groupingid = ?
+				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				ORDER BY firstname
+				;";
+
+			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id));
 		}
 
 		$data = array();
