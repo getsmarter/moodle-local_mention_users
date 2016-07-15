@@ -18,7 +18,6 @@ $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
 $group_id = optional_param('group', 0, PARAM_INT); // Group ID
 
-
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
 $result->content = 'Unknown error';
