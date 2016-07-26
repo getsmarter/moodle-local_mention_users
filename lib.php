@@ -27,10 +27,4 @@ if(get_config('local_mention_users', 'enabletracking') == 1) {
 		$PAGE->requires->css('/local/mention_users/tribute/tribute.css');
 		$PAGE->requires->js_call_amd('local_mention_users/mention_users', 'init');
 	}
-
-	// if(isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'mod/hsuforum/')) {
-	// 	global $PAGE;
-	// 	$PAGE->requires->css('/local/mention_users/tribute/tribute.css');
-	// 	$PAGE->requires->js_call_amd('local_mention_users/mention_users_hsu_forum', 'init');
-	// }
 }
