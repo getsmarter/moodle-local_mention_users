@@ -35,11 +35,17 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     var forum_id = $('input[name=forum]').val();
     var group_id = $('input[name=groupid]').val();
 
-    function getUsers(replyId, forumId, groupId) {
+    if (/hsuforum/.test(window.location.href)) {
+      var advanced_forum = 1;
+    } else {
+      var advanced_forum = 0;
+    }
+
+    function getUsers(replyId, forumId, groupId, advanced_forum) {
       $.ajax({
         dataType: "json",
         url: '/local/mention_users/getusers.php',
-        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId + '&group=' + groupId,
+        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId + '&group=' + groupId + '&advancedforum=' + advanced_forum,
         success: function(json) {
 
           if (json.result) {
@@ -72,12 +78,24 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
         }]
       })
 
-      $(document).ready(function() {
-        tribute.attach(document.getElementById('id_messageeditable'));
+      if (document.getElementById('id_messageeditable')) {
+        $(document).ready(function() {
+          tribute.attach(document.getElementById('id_messageeditable'));
+        });
+      }
+
+      if (document.querySelectorAll('.hsuforum-textarea')) {
+        tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+      }
+
+      $('.hsuforum-add-discussion input[type=submit], .hsuforum-reply-link').on('click', function() {
+        setTimeout(function() {
+          tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+        }, 10);
       });
     }
 
-    getUsers(reply_id, forum_id, group_id);
+    getUsers(reply_id, forum_id, group_id, advanced_forum);
   };
   return module;
 });
