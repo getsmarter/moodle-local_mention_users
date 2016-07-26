@@ -599,7 +599,11 @@ if (!Array.prototype.find) {
               coordinates = this.getContentEditableCaretPosition(info.mentionPosition);
             }
 
-            var topposition = $('#id_messageeditable').offset().top+24
+            if (document.getElementById('id_messageeditable')) {
+              var topposition = $('#id_messageeditable').offset().top+24
+            } else if (document.getElementsByClassName('.hsuforum-textarea')) {
+              var topposition = $('.hsuforum-textarea').offset().top+24
+            }
 
             // Move the button into place.
             this.tribute.menu.style.cssText = 'top: ' + topposition + 'px;\n                                           left: ' + coordinates.left + 'px;\n                                           position: absolute;\n                                           zIndex: 10000;\n                                           display: block;';

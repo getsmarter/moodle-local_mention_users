@@ -17,6 +17,7 @@ $action = required_param('action', PARAM_TEXT); // Action
 $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
 $group_id = optional_param('group', 0, PARAM_INT); // Group ID
+$advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
@@ -29,11 +30,21 @@ if(isloggedin()) {
 
 		global $DB;
 		if ($reply_id != 0 && $forum_id == 0) {
-			$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
-			$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
-			$forum_id = $DB->get_field('forum_discussions', "forum", array("id"=>$forum_discussions_id));
+			if ($advancedforum == 0) {
+				$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
+				$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
+				$forum_id = $DB->get_field('forum_discussions', "forum", array("id"=>$forum_discussions_id));
+			} elseif ($advancedforum == 1) {
+				$forum_discussions_id = $DB->get_field('hsuforum_posts', 'discussion', array("id"=>$reply_id));
+				$course_id = $DB->get_field('hsuforum_discussions', "course", array("id"=>$forum_discussions_id));
+				$forum_id = $DB->get_field('hsuforum_discussions', "forum", array("id"=>$forum_discussions_id));
+			}
 		} elseif ($forum_id != 0 && $reply_id == 0) {
-			$course_id = $DB->get_field('forum', "course", array("id"=>$forum_id));
+			if ($advancedforum == 0) {
+				$course_id = $DB->get_field('forum', "course", array("id"=>$forum_id));
+			} elseif ($advancedforum == 1) {
+				$course_id = $DB->get_field('hsuforum', "course", array("id"=>$forum_id));
+			}
 		}
 
 		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id));
