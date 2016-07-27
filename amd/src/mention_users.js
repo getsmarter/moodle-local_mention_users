@@ -78,20 +78,18 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
         }]
       })
 
+      // Atto Editor
       if (document.getElementById('id_messageeditable')) {
         $(document).ready(function() {
           tribute.attach(document.getElementById('id_messageeditable'));
         });
       }
 
-      if (document.querySelectorAll('.hsuforum-textarea')) {
-        tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
-      }
-
-      $('.hsuforum-add-discussion input[type=submit], .hsuforum-reply-link').on('click', function() {
-        setTimeout(function() {
+      //Advanced forum
+      $( document ).bind("DOMSubtreeModified", function() {
+        if (!$('.hsuforum-textarea').attr('data-tribute')) {
           tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
-        }, 10);
+        }
       });
     }
 
