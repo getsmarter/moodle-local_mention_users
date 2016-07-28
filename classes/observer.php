@@ -60,7 +60,7 @@ class local_mention_users_observer {
 
     $id_array = self::parse_id($content);
 
-    $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#/mod/hsuforum/discuss.php?d=78&postid=' . $post_id;
+    $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
     self::send_email_to_students($id_array, $course_name, $course_coach, $link);
  }
 
