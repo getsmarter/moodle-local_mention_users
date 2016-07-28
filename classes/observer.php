@@ -45,6 +45,25 @@ class local_mention_users_observer {
     self::send_email_to_students($id_array, $course_name, $course_coach, $link);
  }
 
+ public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded $event) {
+    global $DB;
+
+    $other = (object)$event->other;
+
+    $content = $other->content;
+    $discussion_id = $other->discussionid;
+    $post_id = $event->objectid;
+    $course_id = $event->courseid;
+
+    $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
+    $course_coach = self::get_course_coach($course_id);
+
+    $id_array = self::parse_id($content);
+
+    $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#/mod/hsuforum/discuss.php?d=78&postid=' . $post_id;
+    self::send_email_to_students($id_array, $course_name, $course_coach, $link);
+ }
+
  public static function parse_id($content) {
     $string_array = explode('userid="',$content);
     $id_array = array();
@@ -75,19 +94,23 @@ class local_mention_users_observer {
     $body = str_replace("{post_link}", 'http://' . $link, $body);
 
     $bodyhtml = text_to_html($body, null, false, true);
-
     email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
   }
  }
 
  public static function get_course_coach($course_id) {
     global $DB;
+    global $CFG;
 
     $context = context_course::instance($course_id);
     $role_id = get_config('local_mention_users', 'emailfromrole');
-    $users = get_role_users($role_id, $context);
-    $user = current($users);
-    return $user;
+    if ($role_id == 'noreply') {
+        $email = $CFG->noreplyaddress;
+        return $email;
+    } else {
+        $users = get_role_users($role_id, $context);
+        $user = current($users);
+        return $user;
+    }
  }
 }
-

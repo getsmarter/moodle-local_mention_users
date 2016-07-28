@@ -38,13 +38,14 @@ $default = 0;
 $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
 $temp->add($setting);
 
-  // Send to this role
+  // Send from this role
 $name = 'local_mention_users/emailfromrole';
 $title = 'Send from role';
 $description = 'The role of the course instructor or other person you want emails to be sent from. Emails will be sent from the first user with this role in the course.';
 $default = 5;
 $context = context_course::instance(1); // site wide course context
 $roles = get_assignable_roles($context);
+$roles['noreply'] = 'Do-not-reply';
 $setting = new admin_setting_configselect($name, $title, $description, $default, $roles);
 $temp->add($setting);
 
