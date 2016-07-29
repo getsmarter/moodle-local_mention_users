@@ -47,7 +47,13 @@ if(isloggedin()) {
 			}
 		}
 
-		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id));
+		if ($advancedforum == 0) {
+			$moduleid = $DB->get_field('modules', 'id', array("name"=>'forum'));
+		} elseif ($advancedforum == 1) {
+			$moduleid = $DB->get_field('modules', 'id', array("name"=>'hsuforum'));
+		}
+
+		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id, 'module'=>$moduleid));
 		$restrictions = json_decode($availability)->c;
 
 		foreach ($restrictions as $restriction) {
