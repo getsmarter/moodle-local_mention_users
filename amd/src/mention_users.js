@@ -33,12 +33,25 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
 
     var reply_id = $('input[name=reply]').val();
     var forum_id = $('input[name=forum]').val();
-    var group_id = $('input[name=groupid]').val();
+
+
 
     if (/hsuforum/.test(window.location.href)) {
       var advanced_forum = 1;
+
+      // Group ID
+      var group = $('.hsuforum-thread-byline')
+      group.find('a').remove()
+      var groupname = group.text().trim()
+
+      var text = $('#hsuforum-discussion-template').html()
+
+      var text_array = text.split('">' + groupname)[0].split('value="')
+      var group_id = text_array[text_array.length - 1]
+
     } else {
       var advanced_forum = 0;
+      var group_id = $('input[name=groupid]').val();
     }
 
     function getUsers(replyId, forumId, groupId, advanced_forum) {
@@ -94,9 +107,11 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     }
 
     // Anchor links offset because hanging navbar hides half the post by default
-    var shiftWindow = function() { scrollBy(0, -70) };
-    if (location.hash) shiftWindow();
-    window.addEventListener("hashchange", shiftWindow);
+    // var anchor = window.location.hash
+    //             window.location.href = anchor;
+    // var shiftWindow = function() { scrollBy(0, -70) };
+    // if (location.hash) shiftWindow();
+    // window.addEventListener("hashchange", shiftWindow);
 
     getUsers(reply_id, forum_id, group_id, advanced_forum);
   };
