@@ -107,11 +107,9 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     }
 
     // Anchor links offset because hanging navbar hides half the post by default
-    // var anchor = window.location.hash
-    //             window.location.href = anchor;
-    // var shiftWindow = function() { scrollBy(0, -70) };
-    // if (location.hash) shiftWindow();
-    // window.addEventListener("hashchange", shiftWindow);
+    var shiftWindow = function() { scrollBy(0, -70) };
+    if (location.hash) shiftWindow();
+    window.addEventListener("hashchange", shiftWindow);
 
     getUsers(reply_id, forum_id, group_id, advanced_forum);
   };
