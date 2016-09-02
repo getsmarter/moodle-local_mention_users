@@ -17,7 +17,18 @@
 /**
  * Segment
  *
- * @package    local_segment
- * @copyright  2014 GetSmarter {@link http://www.getsmarter.co.za}
+ * @package    local_mention_users
+ * @copyright  2016 GetSmarter {@link http://www.getsmarter.co.za}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+if (get_config('local_mention_users', 'enabletracking') == 1) {
+    if(isset($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], 'mod/forum/post.php') || strpos($_SERVER['REQUEST_URI'], 'mod/hsuforum/'))) {
+        global $PAGE;
+        $PAGE->requires->css('/local/mention_users/tribute/tribute.css');
+        $PAGE->requires->js_call_amd('local_mention_users/mention_users', 'init');
+    }
+}
+
+// This function is included to force moodle to run the local lib.php on every page.
+function local_mention_users_extend_navigation($param) {}
