@@ -56,11 +56,13 @@ if(isloggedin()) {
 		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id, 'module'=>$moduleid));
 		$restrictions = json_decode($availability)->c;
 
-		foreach ($restrictions as $restriction) {
-			if ($restriction->type == 'group') {
-				$group_id = $restriction->id;
-			} elseif ($restriction->type == 'grouping') {
-				$grouping_id = $restriction->id;
+		if (isset($restrictions)) {
+			foreach ($restrictions as $restriction) {
+				if ($restriction->type == 'group') {
+					$group_id = $restriction->id;
+				} elseif ($restriction->type == 'grouping') {
+					$grouping_id = $restriction->id;
+				}
 			}
 		}
 
