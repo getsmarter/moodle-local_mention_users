@@ -34,31 +34,17 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     var reply_id = $('input[name=reply]').val();
     var forum_id = $('input[name=forum]').val();
 
-
-
     if (/hsuforum/.test(window.location.href)) {
       var advanced_forum = 1;
-
-      // Group ID
-      var group = $('.hsuforum-thread-byline')
-      group.find('a').remove()
-      var groupname = group.text().trim()
-
-      var text = $('#hsuforum-discussion-template').html()
-
-      var text_array = text.split('">' + groupname)[0].split('value="')
-      var group_id = text_array[text_array.length - 1]
-
     } else {
       var advanced_forum = 0;
-      var group_id = $('input[name=groupid]').val();
     }
 
-    function getUsers(replyId, forumId, groupId, advanced_forum) {
+    function getUsers(replyId, forumId, advanced_forum) {
       $.ajax({
         dataType: "json",
         url: '/local/mention_users/getusers.php',
-        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId + '&group=' + groupId + '&advancedforum=' + advanced_forum,
+        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId + '&advancedforum=' + advanced_forum,
         success: function(json) {
 
           if (json.result) {
@@ -111,7 +97,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     if (location.hash) shiftWindow();
     window.addEventListener("hashchange", shiftWindow);
 
-    getUsers(reply_id, forum_id, group_id, advanced_forum);
+    getUsers(reply_id, forum_id, advanced_forum);
   };
   return module;
 });

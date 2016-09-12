@@ -34,10 +34,12 @@ if(isloggedin()) {
 				$forum_discussions_id = $DB->get_field('forum_posts', 'discussion', array("id"=>$reply_id));
 				$course_id = $DB->get_field('forum_discussions', "course", array("id"=>$forum_discussions_id));
 				$forum_id = $DB->get_field('forum_discussions', "forum", array("id"=>$forum_discussions_id));
+				$group_id = $DB->get_field('forum_discussions', "groupid", array("id"=>$forum_discussions_id));
 			} elseif ($advancedforum == 1) {
 				$forum_discussions_id = $DB->get_field('hsuforum_posts', 'discussion', array("id"=>$reply_id));
 				$course_id = $DB->get_field('hsuforum_discussions', "course", array("id"=>$forum_discussions_id));
 				$forum_id = $DB->get_field('hsuforum_discussions', "forum", array("id"=>$forum_discussions_id));
+				$group_id = $DB->get_field('hsuforum_discussions', "groupid", array("id"=>$forum_discussions_id));
 			}
 		} elseif ($forum_id != 0 && $reply_id == 0) {
 			if ($advancedforum == 0) {
@@ -66,7 +68,7 @@ if(isloggedin()) {
 			}
 		}
 
-		if ($group_id == 0 && $grouping_id == 0) {
+		if ($group_id <= 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
@@ -86,7 +88,7 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id));
-		} elseif ($group_id != 0 && $grouping_id == 0) {
+		} elseif ($group_id > 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
@@ -109,7 +111,7 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id, $group_id));
-		} elseif ($grouping_id != 0 && $group_id == 0) {
+		} elseif ($grouping_id != 0 && $group_id <= 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
