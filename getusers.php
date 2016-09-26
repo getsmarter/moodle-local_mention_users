@@ -136,16 +136,18 @@ if(isloggedin()) {
 			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id));
 		}
 
-		$data = array();
-		foreach ($users as $user) {
-			array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+		if (isset($users)) {
+			$data = array();
+			foreach ($users as $user) {
+				array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+			}
+
+			$post = json_encode($data);
+
+			$result->result = true;
+			$result->courseid = $course_id;
+			$result->content = $post;
 		}
-
-		$post = json_encode($data);
-
-		$result->result = true;
-		$result->courseid = $course_id;
-		$result->content = $post;
 	}
 	else {
 		$result->result = false;
