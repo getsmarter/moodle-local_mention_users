@@ -35,7 +35,7 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     if ($('input[name=forum]').length > 0) {
       var forum_id = $('input[name=forum]').val();
     }else{
-      var forum_id = getParameterByName('d');
+      var forum_id = 0;
     }
 
     if (/hsuforum/.test(window.location.href)) {
@@ -59,17 +59,6 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
 
         }
       });
-    }
-
-    function getParameterByName(name) {
-      url = window.location.href;
-
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-          results = regex.exec(url);
-      if (!results) return null;
-      if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
     function populateTributeArray(content, courseid) {
