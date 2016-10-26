@@ -111,7 +111,7 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id, $group_id));
-		} elseif ($grouping_id != 0 && $group_id <= 0) {
+		} elseif ($grouping_id != 0 && $group_id >= 0) {
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
