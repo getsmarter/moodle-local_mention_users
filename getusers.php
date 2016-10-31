@@ -136,6 +136,29 @@ if(isloggedin()) {
 				;";
 
 			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id, $group_id));
+		} elseif ($grouping_id != 0 && $group_id == 0) {
+			$sql = "
+				SELECT DISTINCT
+					ue.userid,
+					e.courseid,
+					u.firstname,
+					u.lastname,
+					u.username,
+					r.shortname
+				FROM {user_enrolments} ue
+				JOIN {enrol} e ON (e.id = ue.enrolid)
+				JOIN {user} u ON (ue.userid = u.id)
+				JOIN {role_assignments} ra ON (u.id = ra.userid)
+				JOIN {role} r ON (ra.roleid = r.id)
+				JOIN {groups_members} gm ON (u.id = gm.userid)
+				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
+				WHERE e.courseid = ?
+				AND gg.groupingid = ?
+				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				ORDER BY firstname
+				;";
+
+			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id));
 		}
 
 		if (isset($users)) {
