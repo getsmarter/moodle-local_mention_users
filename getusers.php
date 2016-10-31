@@ -112,6 +112,7 @@ if(isloggedin()) {
 
 			$users = $DB->get_records_sql($sql, array($course_id, $group_id));
 		} elseif ($grouping_id != 0 && $group_id >= 0) {
+			// users should only be able to mention users in their group
 			$sql = "
 				SELECT DISTINCT
 					ue.userid,
@@ -129,11 +130,12 @@ if(isloggedin()) {
 				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
 				WHERE e.courseid = ?
 				AND gg.groupingid = ?
+				AND gm.groupid = ?
 				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
 				ORDER BY firstname
 				;";
 
-			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id));
+			$users = $DB->get_records_sql($sql, array($course_id, $grouping_id, $group_id));
 		}
 
 		if (isset($users)) {
