@@ -77,6 +77,25 @@ if(isloggedin()) {
 			)
 		);
 
+		$course_staff = $DB->get_records_sql(
+			"SELECT DISTINCT
+				ue.userid,
+				e.courseid,
+				u.firstname,
+				u.lastname,
+				u.username,
+				r.shortname
+			FROM {user_enrolments} ue
+			JOIN {enrol} e ON (e.id = ue.enrolid)
+			JOIN {user} u ON (ue.userid = u.id)
+			JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
+			JOIN {role} r ON (ra.roleid = r.id)
+			WHERE e.courseid = ?
+			AND r.shortname IN ('coursecoach', 'headtutor', 'tutor')
+			ORDER BY firstname",
+			array($context_id, $course_id)
+		);
+
 		if ($group_id <= 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
@@ -92,7 +111,7 @@ if(isloggedin()) {
 				JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
 				JOIN {role} r ON (ra.roleid = r.id)
 				WHERE e.courseid = ?
-				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				AND r.shortname = 'student'
 				ORDER BY firstname
 				;";
 
@@ -115,7 +134,7 @@ if(isloggedin()) {
 				JOIN {groups_members} gm ON (ue.userid = gm.userid ) AND (gm.groupid = g.id)
 				WHERE e.courseid = ?
 				AND g.id = ?
-				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				AND r.shortname = 'student'
 				ORDER BY firstname
 				;";
 
@@ -140,7 +159,7 @@ if(isloggedin()) {
 				WHERE e.courseid = ?
 				AND gg.groupingid = ?
 				AND gm.groupid = ?
-				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				AND r.shortname = 'student'
 				ORDER BY firstname
 				;";
 
@@ -163,12 +182,14 @@ if(isloggedin()) {
 				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
 				WHERE e.courseid = ?
 				AND gg.groupingid = ?
-				AND r.shortname IN ('student', 'coursecoach', 'headtutor', 'tutor')
+				AND r.shortname = 'student'
 				ORDER BY firstname
 				;";
 
 			$users = $DB->get_records_sql($sql, array($context_id, $course_id, $grouping_id));
 		}
+
+		$users = array_merge($users, $course_staff);
 
 		if (isset($users)) {
 			$data = array();
