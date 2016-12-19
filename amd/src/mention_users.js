@@ -89,11 +89,30 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
       }
 
       //Advanced forum
-      $( document ).bind("DOMSubtreeModified", function() {
+      document.addEventListener("DOMSubtreeModified", throttle( function() {
         if (!$('.hsuforum-textarea').attr('data-tribute')) {
           tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
         }
-      });
+        if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+          tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+        }
+      }, 50 ), false );
+
+      // This is to ensure that the DOMSubtreeModified event doesn't execute our code over and over.
+      // http://stackoverflow.com/questions/11867331/how-to-identify-that-last-domsubtreemodified-is-fired
+      function throttle( fn, time ) {
+          var t = 0;
+          return function() {
+              var args = arguments,
+                  ctx = this;
+
+                  clearTimeout(t);
+
+              t = setTimeout( function() {
+                  fn.apply( ctx, args );
+              }, time );
+          };
+      }
     }
 
     // Anchor links offset because hanging navbar hides half the post by default

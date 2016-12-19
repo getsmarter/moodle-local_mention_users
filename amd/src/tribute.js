@@ -598,19 +598,11 @@ if (!Array.prototype.find) {
             } else {
               coordinates = this.getContentEditableCaretPosition(info.mentionPosition);
             }
-
-            if (document.getElementById('id_messageeditable')) {
-              var topposition = $('#id_messageeditable').offset().top+24
-            } else if (document.getElementsByClassName('.hsuforum-textarea')) {
-              var topposition = $('.hsuforum-textarea').offset().top+24
-            }
+            // Add position of screen to top of the page to coordinates top
+            coordinates.top = document.body.scrollTop + coordinates.top;
 
             // Move the button into place.
-            this.tribute.menu.style.cssText = 'top: ' + topposition + 'px;\n                                           left: ' + coordinates.left + 'px;\n                                           position: absolute;\n                                           zIndex: 10000;\n                                           display: block;';
-
-            setTimeout(function () {
-              _this7.scrollIntoView(_this7.getDocument().activeElement);
-            }, 0);
+            this.tribute.menu.style.cssText = 'top: ' + coordinates.top + 'px;\n left: ' + coordinates.left + 'px;\n position: absolute;\n zIndex: 10000;\n display: block;';
           } else {
             this.tribute.menu.style.cssText = 'display: none';
           }
