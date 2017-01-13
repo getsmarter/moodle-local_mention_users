@@ -91,22 +91,9 @@ if(isloggedin()) {
 			JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
 			JOIN {role} r ON (ra.roleid = r.id)
 			WHERE e.courseid = ?
-			AND r.shortname IN ('coursecoach', 'headtutor', 'tutor')
+			AND r.shortname IN ('coursecoach', 'headtutor', 'tutor', 'support')
 			ORDER BY firstname",
 			array($context_id, $course_id)
-		);
-
-		$support_staff = $DB->get_records_sql(
-			"SELECT DISTINCT
-				u.id,
-				u.firstname,
-				u.lastname
-			FROM {user} u
-			JOIN {role_assignments} ra ON (u.id = ra.userid)
-			JOIN {role} r ON (ra.roleid = r.id)
-			WHERE r.shortname = 'support'
-			ORDER BY firstname",
-			null
 		);
 
 		if ($group_id <= 0 && $grouping_id == 0) {
@@ -203,7 +190,6 @@ if(isloggedin()) {
 		}
 
 		$users = array_merge($users, $course_staff);
-		$users = array_merge($users, $support_staff);
 
 		if (isset($users)) {
 			$data = array();
