@@ -591,6 +591,8 @@ if (!Array.prototype.find) {
           var context = this.tribute.current,
               coordinates = void 0;
           var info = this.getTriggerInfo(false, false, true);
+          // Allows for Mozilla, Chrome and Safari to all calculate screen height correctly.
+          var screenHeight =  document.documentElement.scrollTop || document.body.scrollTop
 
           if (info !== undefined) {
             if (!this.isContentEditable(context.element)) {
@@ -599,8 +601,7 @@ if (!Array.prototype.find) {
               coordinates = this.getContentEditableCaretPosition(info.mentionPosition);
             }
             // Add position of screen to top of the page to coordinates top
-            coordinates.top = document.body.scrollTop + coordinates.top;
-
+            coordinates.top = screenHeight + coordinates.top
             // Move the button into place.
             this.tribute.menu.style.cssText = 'top: ' + coordinates.top + 'px;\n left: ' + coordinates.left + 'px;\n position: absolute;\n zIndex: 10000;\n display: block;';
           } else {
