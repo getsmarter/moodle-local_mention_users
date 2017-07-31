@@ -34,7 +34,7 @@ $temp = new admin_settingpage('local_mention_users_general',  'Settings', 'local
 $name = 'local_mention_users/enabletracking';
 $title = 'Enable tracking';
 $description = 'Enable or disable mention_users event tracking.';
-$default = 0;
+$default = true;
 $setting = new admin_setting_configcheckbox($name, $title, $description, $default);
 $temp->add($setting);
 
@@ -42,7 +42,7 @@ $temp->add($setting);
 $name = 'local_mention_users/emailfromrole';
 $title = 'Send from role';
 $description = 'The role of the course instructor or other person you want emails to be sent from. Emails will be sent from the first user with this role in the course.';
-$default = 5;
+$default = 'noreply';
 $context = context_course::instance(1); // site wide course context
 $roles = get_assignable_roles($context);
 $roles['noreply'] = 'Do-not-reply';
@@ -65,11 +65,14 @@ $description = 'The value for the body of an email.';
 $default =
 "Hi {student_first_name},
 
-You have been mentioned in a forum post. Please click the following link to view.
+You have been mentioned in a forum post. View the post below:
+'{message_text}'
+
+To view the post in context please click the following link: 
 {post_link}
 
 Regards,
-{coach_first_name}";
+The Student Success Team";
 $setting = new admin_setting_configtextarea($name, $title, $description, $default);
 $temp->add($setting);
 
