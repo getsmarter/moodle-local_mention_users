@@ -505,6 +505,9 @@ if (!Array.prototype.find) {
               // choose first match
               _this6.callbacks().enter(e, el);
             },
+            space: function space(e, el) {
+              _this6.tribute.hideMenu();
+            },
             up: function up(e, el) {
               // navigate up ul
               if (_this6.tribute.isActive) {
@@ -551,7 +554,7 @@ if (!Array.prototype.find) {
       }], [{
         key: 'keys',
         value: function keys() {
-          return [{ key: 9, value: 'TAB' }, { key: 13, value: 'ENTER' }, { key: 27, value: 'ESCAPE' }, { key: 38, value: 'UP' }, { key: 40, value: 'DOWN' }];
+          return [{ key: 9, value: 'TAB' }, { key: 13, value: 'ENTER' }, { key: 27, value: 'ESCAPE' }, { key: 38, value: 'UP' }, { key: 40, value: 'DOWN' }, { key: 32, value: 'SPACE' }];
         }
       }]);
 
