@@ -42,7 +42,7 @@ class local_mention_users_observer {
     $id_array = self::parse_id($content);
 
     $link = $_SERVER['HTTP_HOST'] . '/mod/forum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
-    self::send_email_to_students($id_array, $course_name, $course_coach, $link);
+    self::send_email_to_students($id_array, $course_name, $course_coach, $link, $content);
  }
 
  public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded $event) {
@@ -61,7 +61,7 @@ class local_mention_users_observer {
     $id_array = self::parse_id($content);
 
     $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
-    self::send_email_to_students($id_array, $course_name, $course_coach, $link);
+    self::send_email_to_students($id_array, $course_name, $course_coach, $link, $content);
  }
 
  public static function parse_id($content) {
@@ -77,7 +77,7 @@ class local_mention_users_observer {
     return $id_array;
  }
 
- public static function send_email_to_students($id_array, $course_name, $course_coach, $link) {
+ public static function send_email_to_students($id_array, $course_name, $course_coach, $link, $message_text) {
   foreach ($id_array as $id) {
     global $DB;
     global $CFG;
@@ -92,6 +92,7 @@ class local_mention_users_observer {
     $body = str_replace("{student_first_name}", $student->firstname, $body);
     $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
     $body = str_replace("{post_link}", 'http://' . $link, $body);
+    $body = str_replace("{message_text}", $message_text, $body);
 
     $bodyhtml = text_to_html($body, null, false, true);
     email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
