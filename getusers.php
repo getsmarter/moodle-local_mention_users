@@ -17,6 +17,7 @@ $action = required_param('action', PARAM_TEXT); // Action
 $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
 $group_id = optional_param('group', 0, PARAM_INT); // Group ID
+$grouping_id = '';
 $advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 
 $result = new stdClass();
@@ -56,14 +57,17 @@ if(isloggedin()) {
 		}
 
 		$availability = $DB->get_field('course_modules', "availability", array("course"=>$course_id, "instance"=>$forum_id, 'module'=>$moduleid));
-		$restrictions = json_decode($availability)->c;
 
-		if (isset($restrictions)) {
-			foreach ($restrictions as $restriction) {
-				if ($restriction->type == 'group') {
-					$group_id = $restriction->id;
-				} elseif ($restriction->type == 'grouping') {
-					$grouping_id = $restriction->id;
+		if ($availability) {
+			$restrictions = json_decode($availability)->c;
+
+			if (isset($restrictions)) {
+				foreach ($restrictions as $restriction) {
+					if ($restriction->type == 'group') {
+						$group_id = $restriction->id;
+					} elseif ($restriction->type == 'grouping') {
+						$grouping_id = $restriction->id;
+					}
 				}
 			}
 		}
