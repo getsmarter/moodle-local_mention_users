@@ -13,6 +13,7 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/local/mention_users/lib.php');
 
+$course_id = optional_param('course', 0, PARAM_INT); // Course ID
 $action = required_param('action', PARAM_TEXT); // Action
 $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
