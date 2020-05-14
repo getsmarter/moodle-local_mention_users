@@ -202,7 +202,7 @@ if(isloggedin()) {
 		 */
 		if(!empty($course_staff[$USER->id])) {
 			// Always get only class/group users
-			if(!empty(group_id)) {
+			if(!empty($group_id)) {
 				$groupusersql = "
 				SELECT DISTINCT
 					ue.userid,
