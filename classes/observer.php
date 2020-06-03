@@ -59,41 +59,40 @@ class local_mention_users_observer {
          $taggedusername = '@'.$taggeduser->firstname.' '.$taggeduser->lastname;
 
          if (strpos($content, $taggedusername) !== false ) {
-
              $discussion_id = $other->discussionid;
              $post_id = $event->objectid;
              $course_id = $event->courseid;
 
              $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
 
-             $discussion_name = $DB->get_field("hsuforum_discussions", "name", array("id"=>$discussion_id));
              $from_user = $DB->get_record("user", array("id"=>$event->userid));
-             $fullmessage = '';
-
-             if (isset($from_user) && !empty($from_user)) {
-                 $fullmessage = $from_user->firstname . " " . $from_user->lastname . " mentioned you in " . $course_name . ": " . $discussion_name;
-             } else {
-                 $fullmessage = "You were mentioned in" . $course_name . ": " . $discussion_name;
-             }
 
              $link = $CFG->wwwroot . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
-
              $subject = get_config('local_mention_users', 'defaultproperties_subject');
              $subject = str_replace("{course_fullname}", $course_name, $subject);
 
+             $course_coach = self::get_course_coach($course_id);
+
+             $body = get_config('local_mention_users', 'defaultproperties_body');
+             $body = str_replace("{student_first_name}", $taggedusername, $body);
+             $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
+             $body = str_replace("{post_link}", 'http://' . $link, $body);
+             $body = str_replace("{message_text}", $content, $body);
+             $bodyhtml = text_to_html($body, null, false, true);
+
              $eventdata = new \core\message\message();
-             $eventdata->component        = 'local_getsmarter_communication';
-             $eventdata->name             = 'hsuforum_mentions';
-             $eventdata->userfrom         = isset($from_user) && !empty($from_user) ? $from_user->id : -10;
-             $eventdata->userto           = $id;
-             $eventdata->subject          = $subject;
-             $eventdata->courseid        = $event->courseid;
-             $eventdata->fullmessage      = $fullmessage;
-             $eventdata->fullmessageformat = FORMAT_PLAIN;
-             $eventdata->fullmessagehtml  = '';
-             $eventdata->notification = 1;
-             $eventdata->replyto = '';
-             $eventdata->smallmessage = $subject;
+             $eventdata->component          = 'local_getsmarter_communication';
+             $eventdata->name               = 'hsuforum_mentions';
+             $eventdata->userfrom           = isset($from_user) && !empty($from_user) ? $from_user->id : -10;
+             $eventdata->userto             = $id;
+             $eventdata->subject            = $subject;
+             $eventdata->courseid           = $event->courseid;
+             $eventdata->fullmessage        = $bodyhtml;
+             $eventdata->fullmessageformat  = FORMAT_PLAIN;
+             $eventdata->fullmessagehtml    = '';
+             $eventdata->notification       = 1;
+             $eventdata->replyto            = '';
+             $eventdata->smallmessage       = $subject;
 
              $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id), 'p' . $post_id);
              $eventdata->contexturl = $contexturl->out();
@@ -106,11 +105,6 @@ class local_mention_users_observer {
              }
          }
      }
-
-    $course_coach = self::get_course_coach($course_id);
-
-    $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
-    self::send_email_to_students($id_array, $course_name, $course_coach, $link, $content);
  }
 
  public static function parse_id($content) {
