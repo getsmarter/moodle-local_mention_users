@@ -78,7 +78,6 @@ class local_mention_users_observer {
              $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
              $body = str_replace("{post_link}", 'http://' . $link, $body);
              $body = str_replace("{message_text}", $content, $body);
-             $bodyhtml = text_to_html($body, null, false, true);
 
              $eventdata = new \core\message\message();
              $eventdata->component          = 'local_getsmarter_communication';
