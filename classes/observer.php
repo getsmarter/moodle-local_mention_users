@@ -86,7 +86,7 @@ class local_mention_users_observer {
              $eventdata->userto             = $id;
              $eventdata->subject            = $subject;
              $eventdata->courseid           = $event->courseid;
-             $eventdata->fullmessage        = $bodyhtml;
+             $eventdata->fullmessage        = $body;
              $eventdata->fullmessageformat  = FORMAT_PLAIN;
              $eventdata->fullmessagehtml    = '';
              $eventdata->notification       = 1;
