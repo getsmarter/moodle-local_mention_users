@@ -72,7 +72,6 @@ class local_mention_users_observer {
              $subject = str_replace("{course_fullname}", $course_name, $subject);
 
              $course_coach = self::get_course_coach($course_id);
-
              $body = get_config('local_mention_users', 'defaultproperties_body');
              $body = str_replace("{student_first_name}", $taggedusername, $body);
              $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
