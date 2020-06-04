@@ -76,7 +76,7 @@ class local_mention_users_observer {
              $body = str_replace("{student_first_name}", $taggedusername, $body);
              $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
              $body = str_replace("{post_link}", 'http://' . $link, $body);
-             $body = str_replace("{message_text}", $content, $body);
+             $body = strip_tags(str_replace("{message_text}", $content, $body));
 
              $eventdata = new \core\message\message();
              $eventdata->component          = 'local_getsmarter_communication';
