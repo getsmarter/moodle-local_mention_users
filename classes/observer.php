@@ -67,7 +67,7 @@ class local_mention_users_observer {
 
              $from_user = $DB->get_record("user", array("id"=>$event->userid));
 
-             $link = $CFG->wwwroot . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
+             $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
              $subject = get_config('local_mention_users', 'defaultproperties_subject');
              $subject = str_replace("{course_fullname}", $course_name, $subject);
 
