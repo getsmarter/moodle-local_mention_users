@@ -49,7 +49,7 @@ class local_mention_users_observer {
      global $CFG, $DB;
 
      $other = (object)$event->other;
-     $content = $other->content;
+     $content = str_replace('&nbsp;', ' ', $other->content);
 
      $id_array = self::parse_id($content);
 
@@ -75,7 +75,7 @@ class local_mention_users_observer {
              $body = get_config('local_mention_users', 'defaultproperties_body');
              $body = str_replace("{student_first_name}", $taggedusername, $body);
              $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
-             $body = str_replace("{post_link}", 'http://' . $link, $body);
+             $body = str_replace("{post_link}", $link, $body);
              $body = strip_tags(str_replace("{message_text}", $content, $body));
 
              $eventdata = new \core\message\message();
