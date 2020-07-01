@@ -104,6 +104,7 @@ class local_mention_users_observer {
  }
 
  public static function parse_id($content) {
+
     $string_array = explode('userid="',$content);
     $id_array = array();
 
@@ -117,25 +118,46 @@ class local_mention_users_observer {
  }
 
  public static function send_email_to_students($id_array, $course_name, $course_coach, $link, $message_text) {
-  foreach ($id_array as $id) {
     global $DB;
     global $CFG;
-    require_once($CFG->libdir.'/moodlelib.php');
+    require_once($CFG->libdir.'/moodlelib.php');  
+    foreach ($id_array as $id) {
 
-    $student = $DB->get_record('user', array('id'=>$id));
+        if(strpos($id, ',') !== false) {
+            $all_ids = explode(',', $id);
+            foreach ($all_ids as $all_id) {
+                $student = $DB->get_record('user', array('id'=>$id));
 
-    $subject = get_config('local_mention_users', 'defaultproperties_subject');
-    $body = get_config('local_mention_users', 'defaultproperties_body');
+                $subject = get_config('local_mention_users', 'defaultproperties_subject');
+                $body = get_config('local_mention_users', 'defaultproperties_body');
 
-    $subject = str_replace("{course_fullname}", $course_name, $subject);
-    $body = str_replace("{student_first_name}", $student->firstname, $body);
-    $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
-    $body = str_replace("{post_link}", 'http://' . $link, $body);
-    $body = str_replace("{message_text}", $message_text, $body);
+                $subject = str_replace("{course_fullname}", $course_name, $subject);
+                $body = str_replace("{student_first_name}", $student->firstname, $body);
+                $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
+                $body = str_replace("{post_link}", 'http://' . $link, $body);
+                $body = str_replace("{message_text}", $message_text, $body);
 
-    $bodyhtml = text_to_html($body, null, false, true);
-    email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
-  }
+                $bodyhtml = text_to_html($body, null, false, true);
+                email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
+            }
+        }
+
+        else {
+            $student = $DB->get_record('user', array('id'=>$id));
+
+            $subject = get_config('local_mention_users', 'defaultproperties_subject');
+            $body = get_config('local_mention_users', 'defaultproperties_body');
+
+            $subject = str_replace("{course_fullname}", $course_name, $subject);
+            $body = str_replace("{student_first_name}", $student->firstname, $body);
+            $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
+            $body = str_replace("{post_link}", 'http://' . $link, $body);
+            $body = str_replace("{message_text}", $message_text, $body);
+
+            $bodyhtml = text_to_html($body, null, false, true);
+            email_to_user($student, $course_coach, $subject, $body, $bodyhtml); 
+        }
+    }
  }
 
  public static function get_course_coach($course_id) {
