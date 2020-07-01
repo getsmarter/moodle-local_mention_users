@@ -54,14 +54,12 @@ public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded
     $id_array = self::parse_id($content);
 
     foreach ($id_array as $id) {
-
         if(strpos($id, ',') !== false) {
             $all_ids = explode(',', $id);
             foreach ($all_ids as $id_all) {
                 $taggeduser = $DB->get_record('user', array('id' => $id_all));
                 $taggedusername = $taggeduser->firstname;
-
-                if (strpos($content, $taggedusername) !== false ) {
+                if (strpos($content, 'all') !== false ) {
                     $discussion_id = $other->discussionid;
                     $post_id = $event->objectid;
                     $course_id = $event->courseid;
