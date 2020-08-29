@@ -115,7 +115,7 @@ public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded
                 $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
                 $from_user = $DB->get_record("user", array("id"=>$event->userid));
 
-                $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '#p' . $post_id;
+                $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '&postid=' . $post_id . '#p' . $post_id;
                 $subject = get_config('local_mention_users', 'defaultproperties_subject');
                 $subject = str_replace("{course_fullname}", $course_name, $subject);
                 $course_coach = self::get_course_coach($course_id);
@@ -140,7 +140,7 @@ public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded
                 $eventdata->replyto            = '';
                 $eventdata->smallmessage       = $subject;
 
-                $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id), 'p' . $post_id);
+                $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
                 $eventdata->contexturl = $contexturl->out();
                 $eventdata->contexturlname = (isset($discussion->name) ? $discussion->name : '');
 
