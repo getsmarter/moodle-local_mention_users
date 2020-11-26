@@ -10,6 +10,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+global $CFG, $PAGE, $USER;
+
 require('../../config.php');
 require_once($CFG->dirroot.'/local/mention_users/lib.php');
 
@@ -24,6 +26,32 @@ $advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
 $result->content = 'Unknown error';
+
+/**
+ * @param context_course $context
+ * @param $user
+ * @return bool
+ */
+function check_capability($context, $user)
+{
+    global $result, $USER;
+
+    try {
+        if (has_capability('local/getsmarter:mention_' . $user->shortname, $context)) {
+            return true;
+        }
+    } catch (Exception $e) {
+        error_log($e);
+        $result->result = false;
+        $result->content = $e;
+
+        header('Content-type: application/json');
+        echo json_encode($result);
+        die();
+    }
+
+    return false;
+}
 
 //Only allow to add action if logged in
 if(isloggedin()) {
@@ -195,11 +223,14 @@ if(isloggedin()) {
 		}
 
 		$users = array_merge($users, $course_staff);
+		$context = \context_course::instance($course_id);
 
 		if (isset($users)) {
 			$data = array();
 			foreach ($users as $user) {
-				array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+                if(check_capability($context, $user)) {
+                    array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+                }
 			}
 
 			$post = json_encode($data);
