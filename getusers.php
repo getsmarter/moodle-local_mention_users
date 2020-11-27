@@ -129,6 +129,8 @@ if(isloggedin()) {
 			array($context_id, $course_id)
 		);
 
+		//var_dump($course_staff);
+
 		if ($group_id <= 0 && $grouping_id == 0) {
 			$sql = "
 				SELECT DISTINCT
@@ -145,6 +147,7 @@ if(isloggedin()) {
 				JOIN {role} r ON (ra.roleid = r.id)
 				WHERE e.courseid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -168,6 +171,7 @@ if(isloggedin()) {
 				WHERE e.courseid = ?
 				AND g.id = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -193,6 +197,7 @@ if(isloggedin()) {
 				AND gg.groupingid = ?
 				AND gm.groupid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -216,6 +221,7 @@ if(isloggedin()) {
 				WHERE e.courseid = ?
 				AND gg.groupingid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
