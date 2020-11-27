@@ -37,7 +37,7 @@ function check_capability($context, $user)
     global $result, $USER;
 
     try {
-        if (has_capability('local/getsmarter:mention_' . $user->shortname, $context)) {
+        if (has_capability('local/getsmarter:mention_' . $user->shortname, $context, $USER->id)) {
             return true;
         }
     } catch (Exception $e) {
@@ -124,7 +124,7 @@ if(isloggedin()) {
 			JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
 			JOIN {role} r ON (ra.roleid = r.id)
 			WHERE e.courseid = ?
-			AND r.shortname IN ('coursecoach', 'headtutor', 'tutor', 'support')
+			AND r.shortname != 'student'
 			ORDER BY firstname",
 			array($context_id, $course_id)
 		);
