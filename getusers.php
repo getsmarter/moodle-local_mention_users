@@ -228,11 +228,29 @@ if(isloggedin()) {
 			$users = $DB->get_records_sql($sql, array($context_id, $course_id, $grouping_id));
 		}
 
+        $context = \context_course::instance($course_id);
 		$users = array_merge($users, $course_staff);
-		$context = \context_course::instance($course_id);
+		$allUserIds = "";
+
+		//allUserIds - getting all the current user ids as a specific test just to see it display data on the front end.
+		if (!empty($users)) {
+
+            foreach($users AS $user) {
+                if(check_capability($context, $user)) {
+                    $allUserIds .= $user->userid . ",";
+                }
+            }
+
+            $allUserIds = rtrim($allUserIds, ",");
+        }
 
 		if (isset($users)) {
 			$data = array();
+
+            if(!empty($allUserIds) && has_capability('local/getsmarter:mention_all', $context, $USER->id)) {
+                array_push($data, 'all', $allUserIds);
+            }
+
 			foreach ($users as $user) {
                 if(check_capability($context, $user)) {
                     array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
