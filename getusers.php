@@ -37,9 +37,7 @@ function check_capability($context, $user)
     global $result, $USER;
 
     try {
-        if (has_capability('local/getsmarter:mention_' . $user->shortname, $context, $USER->id)) {
-            return true;
-        }
+        return has_capability('local/getsmarter:mention_' . $user->shortname, $context, $USER->id);
     } catch (Exception $e) {
         error_log($e);
         $result->result = false;
@@ -47,10 +45,7 @@ function check_capability($context, $user)
 
         header('Content-type: application/json');
         echo json_encode($result);
-        die();
     }
-
-    return false;
 }
 
 //Only allow to add action if logged in
@@ -232,7 +227,6 @@ if(isloggedin()) {
 		$users = array_merge($users, $course_staff);
 		$allUserIds = "";
 
-		//allUserIds - getting all the current user ids as a specific test just to see it display data on the front end.
 		if (!empty($users)) {
 
             foreach($users AS $user) {
