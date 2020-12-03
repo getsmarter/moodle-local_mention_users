@@ -24,9 +24,6 @@ $advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
 $result->content = 'Unknown error';
-
-$grouped_users = [];
-
 //Only allow to add action if logged in
 if(isloggedin()) {
 
@@ -195,91 +192,10 @@ if(isloggedin()) {
 
 			$users = $DB->get_records_sql($sql, array($context_id, $course_id, $grouping_id));
 		}
-
-		/**
-		 * We already have course staff, so I just check to see if the current
-		 * user is a course_staff member, if so we add build the @all dataset.
-		 */
-		if(!empty($course_staff[$USER->id])) {
-			// Always get only class/group users
-			if(!empty($group_id)) {
-				$groupusersql = "
-				SELECT DISTINCT
-					ue.userid,
-					e.courseid,
-					u.firstname,
-					u.lastname,
-					u.username,
-					r.shortname
-				FROM {user_enrolments} ue
-				JOIN {enrol} e ON (e.id = ue.enrolid)
-				JOIN {user} u ON (ue.userid = u.id)
-				JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
-				JOIN {role} r ON (ra.roleid = r.id)
-				JOIN {groups_members} gm ON (u.id = gm.userid)
-				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
-				WHERE e.courseid = ?
-				AND gm.groupid = ?
-				AND r.shortname = 'student'
-				ORDER BY firstname;";
-
-				$groupusers = $DB->get_records_sql($groupusersql, array($context_id, $course_id, $group_id));
-			}
-			
-			if(!empty($grouping_id)) {
-				$groupingusersql = "
-				SELECT DISTINCT
-					ue.userid,
-					e.courseid,
-					u.firstname,
-					u.lastname,
-					u.username,
-					r.shortname
-				FROM {user_enrolments} ue
-				JOIN {enrol} e ON (e.id = ue.enrolid)
-				JOIN {user} u ON (ue.userid = u.id)
-				JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
-				JOIN {role} r ON (ra.roleid = r.id)
-				JOIN {groups_members} gm ON (u.id = gm.userid)
-				JOIN {groupings_groups} gg ON (gm.groupid = gg.groupid)
-				WHERE e.courseid = ?
-				AND gm.groupingid = ?
-				AND r.shortname = 'student'
-				ORDER BY firstname;";
-
-				$groupingusers = $DB->get_records_sql($groupingusersql, array($context_id, $course_id, $grouping_id));
-			}
-
-			if(!empty($groupusers) && !empty($groupingusers)) {
-				$grouped_users = array_merge($groupusers, $groupingusers);
-			} elseif(!empty($groupusers)) {
-				$grouped_users = $groupusers;
-			} elseif(!empty($groupingusers)) {
-				$grouped_users = $groupingusers;
-			}
-			
-		}
-
 		$users = array_merge($users, $course_staff);
-		$allUserIds = "";
-		
-		//allUserIds - getting all the current user ids as a specific test just to see it display data on the front end.
-		if (!empty($grouped_users)) {
-			
-			foreach($grouped_users AS $user) {
-				$allUserIds .= $user->userid . ",";
-			}
-			
-			$allUserIds = rtrim($allUserIds, ",");
-		}
 
 		if (isset($users)) {
 			$data = array();
-
-			if(!empty($allUserIds)) {
-				array_push($data, 'all', $allUserIds);	
-			}
-			
 			foreach ($users as $user) {
 				array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
 			}
