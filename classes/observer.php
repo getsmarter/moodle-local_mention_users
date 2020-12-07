@@ -58,6 +58,13 @@ class local_mention_users_observer {
                 $all_ids = explode(',', $id);
                 foreach ($all_ids as $id_all) {
                     $taggeduser = $DB->get_record('user', array('id' => $id_all));
+                    $role = get_user_role_on_current_context($taggeduser->id);
+
+                    // Skip if the user to be notified is not a student.
+                    if($role != 'student') {
+                        continue;
+                    }
+
                     $taggedusername = $taggeduser->firstname;
                     if (strpos($content, 'all') !== false ) {
                         $discussion_id = $other->discussionid;
