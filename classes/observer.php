@@ -24,8 +24,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/mention_users/lib.php');
 
+/**
+ * Class local_mention_users_observer
+ */
 class local_mention_users_observer {
 
+    /**
+     * @param \mod_forum\event\assessable_uploaded $event
+     * @throws dml_exception
+     */
     public static function email_mention(\mod_forum\event\assessable_uploaded $event) {
         global $DB;
 
@@ -45,6 +52,11 @@ class local_mention_users_observer {
         self::send_email_to_students($id_array, $course_name, $course_coach, $link, $content);
     }
 
+    /**
+     * @param \mod_hsuforum\event\assessable_uploaded $event
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public static function email_mention_hsu(\mod_hsuforum\event\assessable_uploaded $event) {
         global $CFG, $DB;
 
@@ -161,6 +173,10 @@ class local_mention_users_observer {
         }
     }
 
+    /**
+     * @param $content
+     * @return array
+     */
     public static function parse_id($content) {
         $string_array = explode('userid="',$content);
         $id_array = array();
@@ -174,6 +190,14 @@ class local_mention_users_observer {
         return $id_array;
     }
 
+    /**
+     * @param $id_array
+     * @param $course_name
+     * @param $course_coach
+     * @param $link
+     * @param $message_text
+     * @throws dml_exception
+     */
     public static function send_email_to_students($id_array, $course_name, $course_coach, $link, $message_text) {
         foreach ($id_array as $id) {
             global $DB;
@@ -196,6 +220,11 @@ class local_mention_users_observer {
         }
     }
 
+    /**
+     * @param $course_id
+     * @return mixed
+     * @throws dml_exception
+     */
     public static function get_course_coach($course_id) {
         global $DB;
         global $CFG;
