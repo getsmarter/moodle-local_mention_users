@@ -10,6 +10,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+global $CFG, $PAGE, $USER;
+
 require('../../config.php');
 require_once($CFG->dirroot.'/local/mention_users/lib.php');
 
@@ -24,6 +26,27 @@ $advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 $result = new stdClass();
 $result->result = false; // set in case uncaught error happens
 $result->content = 'Unknown error';
+
+/**
+ * @param context_course $context
+ * @param $user
+ * @return bool
+ */
+function check_capability($context, $user)
+{
+    global $result, $USER;
+
+    try {
+        return has_capability('local/getsmarter:mention_' . $user->shortname, $context, $USER->id);
+    } catch (Exception $e) {
+        error_log($e);
+        $result->result = false;
+        $result->content = $e;
+
+        header('Content-type: application/json');
+        echo json_encode($result);
+    }
+}
 
 //Only allow to add action if logged in
 if(isloggedin()) {
@@ -96,10 +119,12 @@ if(isloggedin()) {
 			JOIN {role_assignments} ra ON (u.id = ra.userid AND ra.contextid = ?)
 			JOIN {role} r ON (ra.roleid = r.id)
 			WHERE e.courseid = ?
-			AND r.shortname IN ('coursecoach', 'headtutor', 'tutor', 'support')
+			AND r.shortname != 'student'
 			ORDER BY firstname",
 			array($context_id, $course_id)
 		);
+
+		//var_dump($course_staff);
 
 		if ($group_id <= 0 && $grouping_id == 0) {
 			$sql = "
@@ -117,6 +142,7 @@ if(isloggedin()) {
 				JOIN {role} r ON (ra.roleid = r.id)
 				WHERE e.courseid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -140,6 +166,7 @@ if(isloggedin()) {
 				WHERE e.courseid = ?
 				AND g.id = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -165,6 +192,7 @@ if(isloggedin()) {
 				AND gg.groupingid = ?
 				AND gm.groupid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
@@ -188,18 +216,39 @@ if(isloggedin()) {
 				WHERE e.courseid = ?
 				AND gg.groupingid = ?
 				AND r.shortname = 'student'
+				AND ue.status != 1
 				ORDER BY firstname
 				;";
 
 			$users = $DB->get_records_sql($sql, array($context_id, $course_id, $grouping_id));
 		}
 
+        $context = \context_course::instance($course_id);
 		$users = array_merge($users, $course_staff);
+		$allUserIds = "";
+
+		if (!empty($users)) {
+
+            foreach($users AS $user) {
+                if(check_capability($context, $user)) {
+                    $allUserIds .= $user->userid . ",";
+                }
+            }
+
+            $allUserIds = rtrim($allUserIds, ",");
+        }
 
 		if (isset($users)) {
 			$data = array();
+
+            if(!empty($allUserIds) && has_capability('local/getsmarter:mention_all', $context, $USER->id)) {
+                array_push($data, 'all', $allUserIds);
+            }
+
 			foreach ($users as $user) {
-				array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+                if(check_capability($context, $user)) {
+                    array_push($data, $user->firstname . ' ' . $user->lastname, $user->userid);
+                }
 			}
 
 			$post = json_encode($data);
