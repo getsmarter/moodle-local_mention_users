@@ -53,6 +53,24 @@ class local_mention_users_observer {
     }
 
     /**
+     * Function to get the user role on the current context, role short name if exists, if not,
+     * it returns if the user is admin in the current context, blank if not admin.
+     *
+     * @param string $userid Current user id number.
+     * @return string Current user's role shortname
+     */
+    static function get_user_role_on_current_context($userid) {
+        global $COURSE;
+
+        $coursecontext = context_course::instance($COURSE->id);
+        $userrole = current(get_user_roles($coursecontext, $userid));
+
+        if (!empty($userrole->shortname)) return $userrole->shortname;
+
+        return (is_siteadmin()) ? 'admin' : get_user_role_out_of_context($userid);
+    }
+
+    /**
      * @param \mod_hsuforum\event\assessable_uploaded $event
      * @throws dml_exception
      * @throws moodle_exception
@@ -70,7 +88,7 @@ class local_mention_users_observer {
                 $all_ids = explode(',', $id);
                 foreach ($all_ids as $id_all) {
                     $taggeduser = $DB->get_record('user', array('id' => $id_all));
-                    $role = get_user_role_on_current_context($taggeduser->id);
+                    $role = self::get_user_role_on_current_context($taggeduser->id);
 
                     // Skip if the user to be notified is not a student.
                     if($role != 'student') {
