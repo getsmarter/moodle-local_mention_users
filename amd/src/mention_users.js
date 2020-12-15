@@ -45,10 +45,16 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     }
 
     function getUsers(replyId, forumId, advanced_forum) {
+      var new_discussion = window.location.pathname.indexOf("/mod/hsuforum/view.php") > -1;
+
       $.ajax({
         dataType: "json",
         url: '/local/mention_users/getusers.php',
-        data: 'action=tribute' + '&reply=' + replyId + '&forum=' + forumId + '&advancedforum=' + advanced_forum,
+        data: 'action=tribute'
+            + '&reply=' + replyId
+            + '&forum=' + forumId
+            + '&advancedforum=' + advanced_forum
+            + '&new_discussion=' + new_discussion,
         success: function(json) {
 
           if (json.result) {

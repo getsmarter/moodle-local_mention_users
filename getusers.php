@@ -20,6 +20,7 @@ $action = required_param('action', PARAM_TEXT); // Action
 $reply_id = optional_param('reply', 0, PARAM_INT); // Reply ID
 $forum_id = optional_param('forum', 0, PARAM_INT); // Forum ID
 $group_id = optional_param('group', 0, PARAM_INT); // Group ID
+$new_discussion = optional_param('new_discussion', 0, PARAM_BOOL);
 $grouping_id = '';
 $advancedforum = optional_param('advancedforum', 0, PARAM_INT);
 
@@ -227,7 +228,7 @@ if(isloggedin()) {
 		$users = array_merge($users, $course_staff);
 		$allUserIds = "";
 
-		if (!empty($users)) {
+		if (!empty($users) && !$new_discussion) {
 
             foreach($users AS $user) {
                 if(check_capability($context, $user)) {
