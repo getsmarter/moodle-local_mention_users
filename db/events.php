@@ -27,9 +27,5 @@ $observers = array (
     array (
         'eventname' => '\mod_forum\event\assessable_uploaded',
         'callback'  => 'local_mention_users_observer::email_mention',
-    ),
-    array (
-        'eventname' => '\mod_hsuforum\event\assessable_uploaded',
-        'callback'  => 'local_mention_users_observer::email_mention_hsu',
     )
 );
