@@ -31,3 +31,20 @@ if (get_config('local_mention_users', 'enabletracking') == 1) {
 
 // This function is included to force moodle to run the local lib.php on every page.
 function local_mention_users_extend_navigation($param) {}
+
+/**
+ * @param context_course $context - The course context
+ * @param $user - The user
+ * @return bool - If the user can be mentioned
+ */
+function mentions_check_capability($context, $user)
+{
+    global $USER;
+
+    try {
+        return has_capability('local/getsmarter:mention_' . $user->shortname, $context, $USER->id);
+    } catch (Exception $e) {
+        error_log('local_mention_users_mentions_check_capability: ' . $e);
+        return false;
+    }
+}

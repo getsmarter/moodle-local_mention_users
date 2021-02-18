@@ -25,7 +25,7 @@
  * @module local_mention_users/mention
  */
 
-define(['jquery', 'local_mention_users/tribute'], function($) {
+define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax) {
 
   var module = {};
 
@@ -47,24 +47,28 @@ define(['jquery', 'local_mention_users/tribute'], function($) {
     function getUsers(replyId, forumId, advanced_forum) {
       var new_discussion = window.location.pathname.indexOf("/mod/hsuforum/view.php") > -1;
 
-      $.ajax({
-        dataType: "json",
-        url: '/local/mention_users/getusers.php',
-        data: 'action=tribute'
-            + '&reply=' + replyId
-            + '&forum=' + forumId
-            + '&advancedforum=' + advanced_forum
-            + '&new_discussion=' + new_discussion,
-        success: function(json) {
+        var mentionUsers = ajax.call([
+            {
+                methodname: 'local_mention_users_getusers',
+                args: {
+                    action: 'tribute',
+                    reply: replyId,
+                    forum: forumId,
+                    advancedforum: advanced_forum,
+                    newdiscussion: new_discussion
+                }
+            }
+        ]);
 
-          if (json.result) {
-            populateTributeArray(json.content, json.courseid);
-          } else {
-            window.alert(json.content);
-          }
-
-        }
-      });
+        mentionUsers[0].done(function(response) {
+            if (response.result) {
+                populateTributeArray(response.content, response.courseid);
+            } else {
+                throw response.content;
+            }
+        }).fail(function(ex) {
+            throw ex;
+        });
     }
 
     function populateTributeArray(content, courseid) {
