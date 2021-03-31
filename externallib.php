@@ -64,7 +64,7 @@ class local_mention_users_external extends external_api {
      */
     public static function mention_get_users($action, $userid, $replyid, $forumid, $groupid, $newdiscussion, $advancedforum)
     {
-        global $DB;
+        global $DB, $USER;
 
         $params = self::validate_parameters(self::mention_get_users_parameters(), array(
             'action' => $action,
