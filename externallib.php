@@ -40,6 +40,7 @@ class local_mention_users_external extends external_api {
     {
         return new external_function_parameters(array(
             'action' => new external_value(PARAM_TEXT, 'The type of action'),
+            'userid' => new external_value(PARAM_INT, 'The user id', VALUE_DEFAULT, 0),
             'reply' => new external_value(PARAM_INT, 'The reply id', VALUE_DEFAULT, 0),
             'forum' => new external_value(PARAM_INT, 'The forum id', VALUE_DEFAULT, 0),
             'group' => new external_value(PARAM_INT, 'The group id', VALUE_DEFAULT, 0),
@@ -61,12 +62,13 @@ class local_mention_users_external extends external_api {
      * @return Object - List of mentionable users
      * @throws invalid_parameter_exception
      */
-    public static function mention_get_users($action, $replyid, $forumid, $groupid, $newdiscussion, $advancedforum)
+    public static function mention_get_users($action, $userid, $replyid, $forumid, $groupid, $newdiscussion, $advancedforum)
     {
         global $DB;
 
         $params = self::validate_parameters(self::mention_get_users_parameters(), array(
             'action' => $action,
+            'userid' => $userid,
             'reply' =>  $replyid,
             'forum' => $forumid,
             'group' => $groupid,
@@ -75,11 +77,14 @@ class local_mention_users_external extends external_api {
         ));
 
         $action = $params['action'];
+        $userid = $params['userid'];
         $replyid = $params['reply'];
         $forumid = $params['forum'];
         $groupid = $params['group'];
         $newdiscussion = $params['newdiscussion'];
         $advancedforum = $params['advancedforum'];
+
+        $userid = !empty($userid) ? $USER->id : $userid;
 
         $groupingid = '';
         $result = new stdClass();
@@ -273,7 +278,7 @@ class local_mention_users_external extends external_api {
                 if (isset($users)) {
                     $data = array();
 
-                    if(!empty($allUserIds) && has_capability('local/getsmarter:mention_all', $context, $USER->id)) {
+                    if(!empty($allUserIds) && has_capability('local/getsmarter:mention_all', $context, $userid)) {
                         array_push($data, 'all', $allUserIds);
                     }
 
