@@ -84,7 +84,7 @@ class local_mention_users_external extends external_api {
         $newdiscussion = $params['newdiscussion'];
         $advancedforum = $params['advancedforum'];
 
-        $userid = !empty($userid) ? $USER->id : $userid;
+        $userid = empty($userid) ? $USER->id : $userid;
 
         $groupingid = '';
         $result = new stdClass();
