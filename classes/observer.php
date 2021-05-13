@@ -114,6 +114,9 @@ class local_mention_users_observer {
                         $body = str_replace("{post_link}", $link, $body);
                         $body = str_replace("{message_text}", $content, $body);
                         $bodyhtml = text_to_html($body);
+                        
+
+                        $customdata = json_encode(array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id)); 
 
                         $eventdata = new \core\message\message();
                         $eventdata->component          = 'local_getsmarter_communication';
@@ -128,6 +131,8 @@ class local_mention_users_observer {
                         $eventdata->notification       = 1;
                         $eventdata->replyto            = '';
                         $eventdata->smallmessage       = $subject;
+
+                        $eventdata->customdata = $customdata;
 
                         $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
                         $eventdata->contexturl = $contexturl->out();
