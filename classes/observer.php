@@ -115,8 +115,7 @@ class local_mention_users_observer {
                         $body = str_replace("{message_text}", $content, $body);
                         $bodyhtml = text_to_html($body);
                         
-
-                        $customdata = json_encode(array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id)); 
+                        $customdata = array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id); 
 
                         $eventdata = new \core\message\message();
                         $eventdata->component          = 'local_getsmarter_communication';
