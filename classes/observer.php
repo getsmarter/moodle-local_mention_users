@@ -181,6 +181,10 @@ class local_mention_users_observer {
                     $eventdata->replyto            = '';
                     $eventdata->smallmessage       = $subject;
 
+                    $customdata = array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id);
+
+                    $eventdata->customdata = $customdata;
+
                     $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
                     $eventdata->contexturl = $contexturl->out();
                     $eventdata->contexturlname = (isset($discussion->name) ? $discussion->name : '');
