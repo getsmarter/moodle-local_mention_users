@@ -70,6 +70,25 @@ class local_mention_users_observer {
         return (is_siteadmin()) ? 'admin' : get_user_role_out_of_context($userid);
     }
 
+    private function get_post_parents($postid) {
+        global $DB;
+
+        if (!empty($postid)) {
+            $currentparent = $postid;
+            $postparentarray = array();
+            while ($currentparent != 0) {
+                $currentpost =  $DB->get_record('hsuforum_posts', array('id' => $currentparent));
+                if (!empty($currentpost)) {
+                    $postparentarray[$currentparent] = $currentpost->parent;
+
+                    $currentparent = $currentpost->parent;
+                }
+            }
+        }
+        
+        return $postparentarray;
+    }    
+
     /**
      * @param \mod_hsuforum\event\assessable_uploaded $event
      * @throws dml_exception
@@ -114,8 +133,10 @@ class local_mention_users_observer {
                         $body = str_replace("{post_link}", $link, $body);
                         $body = str_replace("{message_text}", $content, $body);
                         $bodyhtml = text_to_html($body);
+
+                        $parentidsarray = $this->get_post_parents($event->contextinstanceid);
                         
-                        $customdata = array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id); 
+                        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' = $parentidsarray);
 
                         $eventdata = new \core\message\message();
                         $eventdata->component          = 'local_getsmarter_communication';
@@ -181,7 +202,9 @@ class local_mention_users_observer {
                     $eventdata->replyto            = '';
                     $eventdata->smallmessage       = $subject;
 
-                    $customdata = array('courseid' => $event->courseid, 'cmid' =>$event->contextinstanceid, 'discussionid' =>$discussion_id);
+                    $parentidsarray = $this->get_post_parents($event->contextinstanceid);
+                        
+                    $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' = $parentidsarray);
 
                     $eventdata->customdata = $customdata;
 
