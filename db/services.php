@@ -15,17 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Segment
+ * Forum external functions and service definitions.
  *
  * @package    local_mention_users
- * @copyright  2016 Norbert Ritter
+ * @copyright  2012 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'local_mention_users';  // Full name of the plugin (used for diagnostics).
-$plugin->version   = 2021062100;       // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2014041100;       // Requires this Moodle version.
-$plugin->maturity  = MATURITY_STABLE;  // The current plugin maturity level.
-$plugin->release   = '1.0.0';          // The current plugin release.
+$functions = array(
+    'local_mention_users_getusers' => array(
+        'classname' => 'local_mention_users_external',
+        'methodname' => 'mention_get_users',
+        'classpath' => 'local/mention_users/externallib.php',
+        'description' => 'Get the tag-able list of users',
+        'type' => 'read',
+        'ajax' => true,
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+        ),
+);
