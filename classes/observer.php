@@ -68,7 +68,7 @@ class local_mention_users_observer {
         if (!empty($userrole->shortname)) return $userrole->shortname;
 
         return (is_siteadmin()) ? 'admin' : get_user_role_out_of_context($userid);
-    }
+    }  
 
     /**
      * @param $content
@@ -183,6 +183,10 @@ class local_mention_users_observer {
                         $body = str_replace("{message_text}", $content, $body);
                         $bodyhtml = text_to_html($body);
 
+                        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid);
+                        
+                        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' => $parentidsarray);
+
                         $eventdata = new \core\message\message();
                         $eventdata->component          = 'local_getsmarter_communication';
                         $eventdata->name               = 'hsuforum_mentions';
@@ -196,6 +200,8 @@ class local_mention_users_observer {
                         $eventdata->notification       = 1;
                         $eventdata->replyto            = '';
                         $eventdata->smallmessage       = $subject;
+
+                        $eventdata->customdata = $customdata;
 
                         $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
                         $eventdata->contexturl = $contexturl->out();
@@ -245,6 +251,12 @@ class local_mention_users_observer {
                     $eventdata->replyto            = '';
                     $eventdata->smallmessage       = $subject;
 
+                    $parentidsarray = self::mention_get_post_parents($post_id);
+
+                    $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' => $parentidsarray);
+
+                    $eventdata->customdata = $customdata;
+
                     $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
                     $eventdata->contexturl = $contexturl->out();
                     $eventdata->contexturlname = (isset($discussion->name) ? $discussion->name : '');
@@ -259,4 +271,90 @@ class local_mention_users_observer {
         }
     }
 
+    /**
+     * @param $content
+     * @return array
+     */
+    public static function parse_id($content) {
+        $string_array = explode('userid="',$content);
+        $id_array = array();
+
+        for ($x = 1; $x < count($string_array); $x++) {
+            $string = $string_array[$x];
+            $id = explode('">', $string)[0];
+            array_push($id_array, $id);
+        }
+
+        return $id_array;
+    }
+
+    /**
+     * @param $id_array
+     * @param $course_name
+     * @param $course_coach
+     * @param $link
+     * @param $message_text
+     * @throws dml_exception
+     */
+    public static function send_email_to_students($id_array, $course_name, $course_coach, $link, $message_text) {
+        foreach ($id_array as $id) {
+            global $DB;
+            global $CFG;
+            require_once($CFG->libdir.'/moodlelib.php');
+
+            $student = $DB->get_record('user', array('id'=>$id));
+
+            $subject = get_config('local_mention_users', 'defaultproperties_subject');
+            $body = get_config('local_mention_users', 'defaultproperties_body');
+
+            $subject = str_replace("{course_fullname}", $course_name, $subject);
+            $body = str_replace("{student_first_name}", $student->firstname, $body);
+            $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
+            $body = str_replace("{post_link}", 'http://' . $link, $body);
+            $body = str_replace("{message_text}", $message_text, $body);
+
+            $bodyhtml = text_to_html($body, null, false, true);
+            email_to_user($student, $course_coach, $subject, $body, $bodyhtml);
+        }
+    }
+
+    /**
+     * @param $course_id
+     * @return mixed
+     * @throws dml_exception
+     */
+    public static function get_course_coach($course_id) {
+        global $DB;
+        global $CFG;
+
+        $context = context_course::instance($course_id);
+        $role_id = get_config('local_mention_users', 'emailfromrole');
+        if ($role_id == 'noreply') {
+            $email = $CFG->noreplyaddress;
+            return $email;
+        } else {
+            $users = get_role_users($role_id, $context);
+            $user = current($users);
+            return $user;
+        }
+    }
+
+    public static function mention_get_post_parents($postid) {
+        global $DB;
+
+        if (!empty($postid)) {
+            $currentparent = $postid;
+            $postparentarray = array();
+            while ($currentparent != 0) {
+                $currentpost =  $DB->get_record('hsuforum_posts', array('id' => $currentparent));
+                if (!empty($currentpost)) {
+                    $postparentarray[$currentparent] = $currentpost->parent;
+
+                    $currentparent = $currentpost->parent;
+                }
+            }
+        }
+        
+        return $postparentarray;
+    }
 }
