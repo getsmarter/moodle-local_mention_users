@@ -151,6 +151,11 @@ class local_mention_users_observer {
 
         $id_array = self::parse_id($content);
 
+
+        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid);
+        
+        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $$other->discussionid, 'postparents' => $parentidsarray);
+
         foreach ($id_array as $id) {
             if(strpos($id, ',') !== false) {
                 $all_ids = explode(',', $id);
@@ -182,10 +187,6 @@ class local_mention_users_observer {
                         $body = str_replace("{post_link}", $link, $body);
                         $body = str_replace("{message_text}", $content, $body);
                         $bodyhtml = text_to_html($body);
-
-                        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid);
-                        
-                        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' => $parentidsarray);
 
                         $eventdata = new \core\message\message();
                         $eventdata->component          = 'local_getsmarter_communication';
@@ -250,10 +251,6 @@ class local_mention_users_observer {
                     $eventdata->notification       = 1;
                     $eventdata->replyto            = '';
                     $eventdata->smallmessage       = $subject;
-
-                    $parentidsarray = self::mention_get_post_parents($post_id);
-
-                    $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $discussion_id, 'postparents' => $parentidsarray);
 
                     $eventdata->customdata = $customdata;
 
