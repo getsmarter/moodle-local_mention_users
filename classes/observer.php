@@ -151,11 +151,6 @@ class local_mention_users_observer {
 
         $id_array = self::parse_id($content);
 
-
-        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid);
-        
-        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $$other->discussionid, 'postparents' => $parentidsarray);
-
         foreach ($id_array as $id) {
             if(strpos($id, ',') !== false) {
                 $all_ids = explode(',', $id);
