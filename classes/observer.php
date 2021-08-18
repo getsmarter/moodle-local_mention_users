@@ -151,6 +151,10 @@ class local_mention_users_observer {
 
         $id_array = self::parse_id($content);
 
+        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid, $other->discussionid);
+        
+        $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $other->discussionid, 'postparents' => $parentidsarray);
+
         foreach ($id_array as $id) {
             if(strpos($id, ',') !== false) {
                 $all_ids = explode(',', $id);
@@ -263,19 +267,18 @@ class local_mention_users_observer {
         }
     }
     
-    public static function mention_get_post_parents($postid) {
+    public static function mention_get_post_parents($postid, $discussionid) {
         global $DB;
 
-        if (!empty($postid)) {
+        $posts = $DB->get_records_menu('hsuforum_posts', array('discussion' => $discussionid), '', 'id, parent');
+
+        if (!empty($posts)) {
             $currentparent = $postid;
             $postparentarray = array();
             while ($currentparent != 0) {
-                $currentpost =  $DB->get_record('hsuforum_posts', array('id' => $currentparent));
-                if (!empty($currentpost)) {
-                    $postparentarray[$currentparent] = $currentpost->parent;
+                $postparentarray[$currentparent] = $posts[$currentparent];
 
-                    $currentparent = $currentpost->parent;
-                }
+                $currentparent = $posts[$currentparent];
             }
         }
         
