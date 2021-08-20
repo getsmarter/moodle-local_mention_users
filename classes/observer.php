@@ -151,7 +151,7 @@ class local_mention_users_observer {
 
         $id_array = self::parse_id($content);
 
-        $parentidsarray = self::mention_get_post_parents($event->contextinstanceid, $other->discussionid);
+        $parentidsarray = self::mention_get_post_parents($event->objectid, $other->discussionid);
         
         $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $other->discussionid, 'postparents' => $parentidsarray);
 
