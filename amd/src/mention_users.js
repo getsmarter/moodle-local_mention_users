@@ -26,11 +26,9 @@
  */
 
 define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax) {
-
   var module = {};
 
   module.init = function() {
-
     var reply_id = $('input[name=reply]').val();
     if ($('input[name=forum]').length > 0) {
       var forum_id = $('input[name=forum]').val();
@@ -91,6 +89,21 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
         }]
       })
 
+        window.tributeinstance = tribute;
+        window.usersarray = users_array;
+
+      let user = null;
+      let userid = window.location.search.match(/u=(\d+)/);
+      let useridpassed = false;
+      let windowhashash = false;
+      if (userid !== null) {
+        // This is a bit hacky, but if a user has the auto-tag functionality, once they submit, it retags user, so if
+        // there is the hash (which is added to scroll to the post), don't allow aut-tagging
+        useridpassed = true;
+        windowhashash = window.location.hash !== '';
+        user = users_array.filter(function(item) {return item.value == userid[1]})[0];
+      }
+
       // Atto Editor
       if (document.getElementById('id_messageeditable')) {
         $(document).ready(function() {
@@ -102,9 +115,23 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
       document.addEventListener("DOMSubtreeModified", throttle( function() {
         if (!$('.hsuforum-textarea').attr('data-tribute')) {
           tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+          if (useridpassed && !windowhashash){
+            $('.hsuforum-textarea').append(
+              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
+            )
+          } else if (useridpassed && windowhashash) {
+            $('.hsuforum-textarea').empty();
+          }
         }
         if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
           tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+          if (useridpassed && !windowhashash){
+            $('#hiddenadvancededitoreditable').append(
+              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
+            )
+          } else if (useridpassed && windowhashash) {
+            $('#hiddenadvancededitoreditable').empty();
+          }
         }
       }, 50 ), false );
 
