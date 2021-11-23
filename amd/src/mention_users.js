@@ -26,9 +26,11 @@
  */
 
 define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax) {
+
   var module = {};
 
   module.init = function() {
+
     var reply_id = $('input[name=reply]').val();
     if ($('input[name=forum]').length > 0) {
       var forum_id = $('input[name=forum]').val();
@@ -89,8 +91,8 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
         }]
       })
 
-        window.tributeinstance = tribute;
-        window.usersarray = users_array;
+      window.tributeinstance = tribute;
+      window.usersarray = users_array;
 
       let user = null;
       let userid = window.location.search.match(/u=(\d+)/);
@@ -115,10 +117,14 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
       document.addEventListener("DOMSubtreeModified", throttle( function() {
         if (!$('.hsuforum-textarea').attr('data-tribute')) {
           tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+        }
+        if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+          tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
           if (useridpassed && !windowhashash){
             $('.hsuforum-textarea').append(
               '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
-            )
+            );
+            $('.hsuforum-textarea').get(0).scrollIntoView();
           } else if (useridpassed && windowhashash) {
             $('.hsuforum-textarea').empty();
           }
@@ -129,6 +135,7 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
             $('#hiddenadvancededitoreditable').append(
               '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
             )
+            $('#hiddenadvancededitoreditable').get(0).scrollIntoView();
           } else if (useridpassed && windowhashash) {
             $('#hiddenadvancededitoreditable').empty();
           }
@@ -156,6 +163,12 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
     var shiftWindow = function() { scrollBy(0, -70) };
     if (location.hash) shiftWindow();
     window.addEventListener("hashchange", shiftWindow);
+    window.addEventListener('hashchange', function() {
+      setTimeout(function() {
+        $('.hsuforum-textarea').empty();
+        $('#hiddenadvancededitoreditable').empty();
+      }, 1000);
+    });
 
     getUsers(reply_id, forum_id, advanced_forum);
   };
