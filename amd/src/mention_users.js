@@ -122,7 +122,7 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
           tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
           if (useridpassed && !windowhashash){
             $('.hsuforum-textarea').append(
-              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
+              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
             );
             $('.hsuforum-textarea').get(0).scrollIntoView();
           } else if (useridpassed && windowhashash) {
@@ -133,7 +133,7 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
           tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
           if (useridpassed && !windowhashash){
             $('#hiddenadvancededitoreditable').append(
-              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>'
+              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
             )
             $('#hiddenadvancededitoreditable').get(0).scrollIntoView();
           } else if (useridpassed && windowhashash) {
