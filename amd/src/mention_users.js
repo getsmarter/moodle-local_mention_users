@@ -104,9 +104,8 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
         useridpassed = true;
         windowhashash = window.location.hash !== '';
         user = users_array.filter(function(item) {return item.value == userid[1]})[0];
-        window.addEventListener('hashchange', function() {
+        $('form').on('submit', function() {
           setTimeout(function() {
-            if (userid)
             $('.hsuforum-textarea').empty();
             $('#hiddenadvancededitoreditable').empty();
           }, 1000);
