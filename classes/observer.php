@@ -68,7 +68,7 @@ class local_mention_users_observer {
         if (!empty($userrole->shortname)) return $userrole->shortname;
 
         return (is_siteadmin()) ? 'admin' : get_user_role_out_of_context($userid);
-    }  
+    }
 
     /**
      * @param $content
@@ -152,7 +152,7 @@ class local_mention_users_observer {
         $id_array = self::parse_id($content);
 
         $parentidsarray = self::mention_get_post_parents($event->objectid, $other->discussionid);
-        
+
         $customdata = array('courseid' => $event->courseid, 'cmid' => $event->contextinstanceid, 'discussionid' => $other->discussionid, 'postparents' => $parentidsarray);
 
         foreach ($id_array as $id) {
@@ -172,6 +172,9 @@ class local_mention_users_observer {
                         $discussion_id = $other->discussionid;
                         $post_id = $event->objectid;
                         $course_id = $event->courseid;
+
+                        //@all already here strip href from @all tag, leave for everything else
+                        $content = preg_replace('#<a.*?>(.*?)@all</a>#i', '@all', $content);
 
                         $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
                         $from_user = $DB->get_record("user", array("id"=>$event->userid));
@@ -266,7 +269,7 @@ class local_mention_users_observer {
             }
         }
     }
-    
+
     public static function mention_get_post_parents($postid, $discussionid) {
         global $DB;
 
@@ -281,7 +284,7 @@ class local_mention_users_observer {
                 $currentparent = $posts[$currentparent];
             }
         }
-        
+
         return $postparentarray;
     }
 }
