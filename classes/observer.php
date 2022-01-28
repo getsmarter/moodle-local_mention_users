@@ -172,14 +172,12 @@ class local_mention_users_observer {
                         $discussion_id = $other->discussionid;
                         $post_id = $event->objectid;
                         $course_id = $event->courseid;
-
-                        //@all already here strip href from @all tag, leave for everything else
-                        $content = preg_replace('#<a.*?>(.*?)@all</a>#i', '@all', $content);
+                        $reply_id = $event->objectid;
 
                         $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
                         $from_user = $DB->get_record("user", array("id"=>$event->userid));
 
-                        $link = $_SERVER['HTTP_HOST'] . '/mod/hsuforum/discuss.php?d=' . $discussion_id . '&postid' . $post_id . '#p' . $post_id;
+                        $link = $_SERVER['HTTP_HOST'] . '/blocks/hsuforum_users/forumusers.php?courseid=' . $course_id . '&discussion=' . $discussion_id . '&reply=' . $reply_id;
                         $subject = get_config('local_mention_users', 'defaultproperties_subject');
                         $subject = str_replace("{course_fullname}", $course_name, $subject);
                         $course_coach = self::get_course_coach($course_id);
@@ -206,7 +204,7 @@ class local_mention_users_observer {
 
                         $eventdata->customdata = $customdata;
 
-                        $contexturl = new moodle_url('/mod/hsuforum/discuss.php', array('d' => $discussion_id, 'postid' => $post_id), 'p' . $post_id);
+                        $contexturl = new moodle_url('/blocks/hsuforum_users/forumusers.php', array('courseid' => $course_id, 'discussion' => $discussion_id, 'reply' => $reply_id));
                         $eventdata->contexturl = $contexturl->out();
                         $eventdata->contexturlname = (isset($discussion->name) ? $discussion->name : '');
 
