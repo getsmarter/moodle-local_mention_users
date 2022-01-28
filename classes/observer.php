@@ -176,7 +176,7 @@ class local_mention_users_observer {
                         $course_name = $DB->get_field("course", "fullname", array("id"=>$course_id));
                         $from_user = $DB->get_record("user", array("id"=>$event->userid));
 
-                        $link = new moodle_url('/blocks/hsuforum_users/forumusers.php?courseid=' . $course_id . '&discussion=' . $discussion_id . '&reply=' . $post_id;
+                        $link = new moodle_url('/blocks/hsuforum_users/forumusers.php?courseid=' . $course_id . '&discussion=' . $discussion_id . '&reply=' . $post_id);
                         $subject = get_config('local_mention_users', 'defaultproperties_subject');
                         $subject = str_replace("{course_fullname}", $course_name, $subject);
                         $course_coach = self::get_course_coach($course_id);
