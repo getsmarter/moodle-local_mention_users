@@ -109,7 +109,7 @@ class local_mention_users_observer {
             $subject = str_replace("{course_fullname}", $course_name, $subject);
             $body = str_replace("{student_first_name}", $student->firstname, $body);
             $body = str_replace("{coach_first_name}", $course_coach->firstname, $body);
-            $body = str_replace("{post_link}", 'http://'. $link, $body);
+            $body = str_replace("{post_link}", 'http://' . $link, $body);
             $body = str_replace("{message_text}", $message_text, $body);
 
             $bodyhtml = text_to_html($body, null, false, true);
