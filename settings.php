@@ -69,7 +69,7 @@ You have been mentioned in a forum post. View the post below:
 '{message_text}'
 
 To view the post in context please click the following link: 
-{post_link}
+<a href='{post_link}'>{post_link}</a>
 
 Regards,
 The Student Success Team";
