@@ -15,8 +15,7 @@
 
 /**
  * Version details
- *
- * @package    local_mention_users
+ * @package
  * @copyright  2014 GetSmarter {@link http://www.getsmarter.co.za}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,72 +23,82 @@
 /**
  * @module local_mention_users/mention
  */
+define(['jquery', 'core/ajax', 'tribute'], function($, ajax) {
 
-define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax) {
+    var module = {};
 
-  var module = {};
+    module.init = function() {
 
-  module.init = function() {
+        var reply_id = $('input[name=reply]').val();
+        if ($('input[name=forum]').length > 0) {
+            var forum_id = $('input[name=forum]').val();
+        } else {
+            var forum_id = 0;
+        }
 
-    var reply_id = $('input[name=reply]').val();
-    if ($('input[name=forum]').length > 0) {
-      var forum_id = $('input[name=forum]').val();
-    }else{
-      var forum_id = 0;
-    }
+        if (/hsuforum/.test(window.location.href)) {
+            var advanced_forum = 1;
+        } else {
+            var advanced_forum = 0;
+        }
 
-    if (/hsuforum/.test(window.location.href)) {
-      var advanced_forum = 1;
-    } else {
-      var advanced_forum = 0;
-    }
+        /**
+         * @param {replyId} replyId
+         * @param {forumId} forumId
+         * @param {advanced_forum} advanced_forum
+         */
+        function getUsers(replyId, forumId, advanced_forum) {
+            var new_discussion = window.location.pathname.indexOf("/mod/hsuforum/view.php") > -1;
 
-    function getUsers(replyId, forumId, advanced_forum) {
-      var new_discussion = window.location.pathname.indexOf("/mod/hsuforum/view.php") > -1;
-
-        var mentionUsers = ajax.call([
-            {
-                methodname: 'local_mention_users_getusers',
-                args: {
-                    action: 'tribute',
-                    reply: replyId,
-                    forum: forumId,
-                    advancedforum: advanced_forum,
-                    newdiscussion: new_discussion
+            var mentionUsers = ajax.call([
+                {
+                    methodname: 'local_mention_users_getusers',
+                    args: {
+                        action: 'tribute',
+                        reply: replyId,
+                        forum: forumId,
+                        advancedforum: advanced_forum,
+                        newdiscussion: new_discussion
+                    }
                 }
+            ]);
+
+            mentionUsers[0].done(function (response) {
+                if (response.result) {
+                    populateTributeArray(response.content, response.courseid);
+                } else {
+                    throw response.content;
+                }
+            }).fail(function (ex) {
+                throw ex;
+            });
+        }
+
+        /**
+         * @param {content} content
+         * @param {courseid} courseid
+         */
+        function populateTributeArray(content, courseid) {
+            var data = JSON.parse(content);
+            var users_array = [];
+
+            for (let i = 0; i < data.length; i += 2) {
+                users_array.push({
+                    key: data[i],
+                    value: data[i + 1]
+                });
             }
-        ]);
-
-        mentionUsers[0].done(function(response) {
-            if (response.result) {
-                populateTributeArray(response.content, response.courseid);
-            } else {
-                throw response.content;
-            }
-        }).fail(function(ex) {
-            throw ex;
-        });
-    }
-
-    function populateTributeArray(content, courseid) {
-      var data = JSON.parse(content);
-      var users_array = [];
-
-      for (i = 0; i < data.length; i += 2) {
-        users_array.push({
-          key: data[i],
-          value: data[i + 1]
-        });
-      }
 
       var tribute = new Tribute({
         collection: [{
           selectTemplate: function(item) {
-            return '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + item.original.value + '&course=' + courseid + ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
+            return '<span contenteditable="false"><a href=' + window.location.origin +
+                '/user/view.php?id=' + item.original.value + '&course=' + courseid +
+                ' target="_blank" userid="' + item.original.value + '">@' + item.original.key + '</a></span>';
           },
           values: users_array
         }]
-      })
+      });
 
       window.tributeinstance = tribute;
       window.usersarray = users_array;
@@ -103,7 +112,7 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
         // there is the hash (which is added to scroll to the post), don't allow aut-tagging
         useridpassed = true;
         windowhashash = window.location.hash !== '';
-        user = users_array.filter(function(item) {return item.value == userid[1]})[0];
+        user = users_array.filter(function(item) {return item.value == userid[1];})[0];
         $('form').on('submit', function() {
           setTimeout(function() {
             $('.hsuforum-textarea').empty();
@@ -119,57 +128,76 @@ define(['jquery', 'core/ajax', 'local_mention_users/tribute'], function($, ajax)
         });
       }
 
-      //Advanced forum
-      document.addEventListener("DOMSubtreeModified", throttle( function() {
-        if (!$('.hsuforum-textarea').attr('data-tribute')) {
-          tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+            // Advanced forum
+            const postObserver = new MutationObserver(function (mutationList) {
+                for (const record of mutationList) {
+                    if (record.type === "attributes") {
+                        if ($(record).hasClass('hsuforum-textarea')) {
+                            // eslint-disable-next-line no-console
+                            console.log(`The ${record.attributeName} -------- attribute was mentionuser modified.`);
+                            // eslint-disable-next-line no-console
+                            console.log(`The ` + $(record) +  `-------- attribute was mentionuser modified.`);
+                        }
+                    }
+                    // eslint-disable-next-line no-console
+                    for (const addedNode of record.addedNodes) {
+                        if ($(addedNode).hasClass('hsuforum-textarea')) {
+                            // eslint-disable-next-line no-console
+                            console.log(`The ${addedNode.attributeName} -------- attribute was addedNode modified.`);
+                        }
+                    }
+                    // eslint-disable-next-line no-console
+                    console.log(record.target.childNodes.length);
+                }
+
+                    if (!$('.hsuforum-textarea').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
+                    }
+                    if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+                        if (useridpassed && !windowhashash) {
+                            $('.hsuforum-textarea').append(
+                                // eslint-disable-next-line max-len
+                                '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
+                            );
+                            $('.hsuforum-textarea').get(0).scrollIntoView();
+                        } else if (useridpassed && windowhashash) {
+                            $('.hsuforum-textarea').empty();
+                        }
+                    }
+                    if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+                        if (useridpassed && !windowhashash) {
+                            $('#hiddenadvancededitoreditable').append(
+                                // eslint-disable-next-line max-len
+                                '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
+                            );
+                            $('#hiddenadvancededitoreditable').get(0).scrollIntoView();
+                        } else if (useridpassed && windowhashash) {
+                            $('#hiddenadvancededitoreditable').empty();
+                        }
+                    }
+            });
+            const observerOptions = {
+                childList: true,
+                subtree: true,
+                attributes: true,
+            };
+            if (document.querySelector('.hsuforum-textarea') ) {
+                postObserver.observe(document.querySelector('.hsuforum-textarea'), observerOptions);
+            }
+            postObserver.observe(document.querySelector('#hiddenadvancededitoreditable'), observerOptions);
         }
-        if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
-          tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
-          if (useridpassed && !windowhashash){
-            $('.hsuforum-textarea').append(
-              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
-            );
-            $('.hsuforum-textarea').get(0).scrollIntoView();
-          } else if (useridpassed && windowhashash) {
-            $('.hsuforum-textarea').empty();
-          }
+
+        // Anchor links offset because hanging navbar hides half the post by default.
+        var shiftWindow = function() {
+            scrollBy(0, -70);
+        };
+        if (location.hash) {
+            shiftWindow();
         }
-        if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
-          tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
-          if (useridpassed && !windowhashash){
-            $('#hiddenadvancededitoreditable').append(
-              '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
-            )
-            $('#hiddenadvancededitoreditable').get(0).scrollIntoView();
-          } else if (useridpassed && windowhashash) {
-            $('#hiddenadvancededitoreditable').empty();
-          }
-        }
-      }, 50 ), false );
-
-      // This is to ensure that the DOMSubtreeModified event doesn't execute our code over and over.
-      // http://stackoverflow.com/questions/11867331/how-to-identify-that-last-domsubtreemodified-is-fired
-      function throttle( fn, time ) {
-          var t = 0;
-          return function() {
-              var args = arguments,
-                  ctx = this;
-
-                  clearTimeout(t);
-
-              t = setTimeout( function() {
-                  fn.apply( ctx, args );
-              }, time );
-          };
-      }
-    }
-
-    // Anchor links offset because hanging navbar hides half the post by default
-    var shiftWindow = function() { scrollBy(0, -70) };
-    if (location.hash) shiftWindow();
-    window.addEventListener("hashchange", shiftWindow);
-    getUsers(reply_id, forum_id, advanced_forum);
-  };
-  return module;
+        window.addEventListener("hashchange", shiftWindow);
+        getUsers(reply_id, forum_id, advanced_forum);
+    };
+    return module;
 });
