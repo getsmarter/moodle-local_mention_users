@@ -23,7 +23,7 @@
 /**
  * @module local_mention_users/mention
  */
-define(['jquery', 'core/ajax', 'tribute'], function($, ajax) {
+define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
 
     var module = {};
 
