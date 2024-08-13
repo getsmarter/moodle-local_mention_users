@@ -164,9 +164,8 @@ define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
                 observer.observe(target, config);
             };
 
-            watch('#hiddenadvancededitoreditable', (mutation) => {
-                let ele = mutation.target;
-                if (!$(ele).attr('data-tribute')) {
+            watch('.hsuforum-thread-body', (mutation) => {
+                if (mutation.target &&  !$('.hsuforum-textarea').attr('data-tribute')) {
                     tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
                 }
                 if (!$('.hsuforum-textarea').attr('data-tribute')) {
