@@ -794,7 +794,6 @@ if (!Array.prototype.find) {
             while (node != el.firstChild) {
               lastNode = frag.appendChild(el.firstChild);
             }
-
             range.insertNode(frag);
 
             if (lastNode) {
