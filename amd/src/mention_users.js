@@ -153,7 +153,7 @@ define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
                     mutations.forEach(callback);
                 };
 
-                // Throttle the handler calls e.g. 1000ms
+                // Throttle the handler calls
                 const observer = new MutationObserver(throttle(handler, throttleDelay));
 
                 // Select the target node
@@ -164,7 +164,7 @@ define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
                 observer.observe(target, config);
             };
 
-            watch('.hsuforum-thread-body', (mutation) => {
+            watch('.hsuforum-textarea', (mutation) => {
                 if (mutation.target &&  !$('.hsuforum-textarea').attr('data-tribute')) {
                     tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
                 }

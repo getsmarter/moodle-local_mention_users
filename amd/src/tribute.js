@@ -791,7 +791,7 @@ if (!Array.prototype.find) {
             var frag = this.getDocument().createDocumentFragment(),
                 node = void 0,
                 lastNode = void (0);
-            while (node == el.firstChild) {
+            while (node != el.firstChild) {
               lastNode = frag.appendChild(el.firstChild);
             }
 
