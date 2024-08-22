@@ -165,7 +165,6 @@ define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
             };
 
             watch('#region-main', (mutation) => {
-                // eslint-disable-next-line no-console
                 if (mutation.type === 'attributes' || mutation.type === 'subtree' ||  mutation.type === 'childList' ) {
                     if (!$('.hsuforum-textarea').attr('data-tribute')) {
                         tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
