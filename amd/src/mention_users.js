@@ -164,34 +164,36 @@ define(['jquery', 'core/ajax', './tribute'], function($, ajax) {
                 observer.observe(target, config);
             };
 
-            watch('.hsuforum-textarea', (mutation) => {
-                if (mutation.target &&  !$('.hsuforum-textarea').attr('data-tribute')) {
-                    tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
-                }
-                if (!$('.hsuforum-textarea').attr('data-tribute')) {
-                    tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
-                    if (useridpassed && !windowhashash) {
-                        $('.hsuforum-textarea').append(
-                            '<span contenteditable="false"><a href=' + window.location.origin +
-                            '/user/view.php?id=' + user.value + '&course=' + courseid +
-                            ' target="_blank" userid="' + user.value + '">@' + user.key + '</a></span>&nbsp;'
-                        );
-                        $('.hsuforum-textarea').get(0).scrollIntoView();
-                    } else if (useridpassed && windowhashash) {
-                        $('.hsuforum-textarea').empty();
+            watch('#region-main', (mutation) => {
+                if (mutation.type === 'childList') {
+                    if (!$('.hsuforum-textarea').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('.hsuforum-textarea'));
                     }
-                }
-                if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
-                    tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
-                    if (useridpassed && !windowhashash) {
-                        $('.hsuforum-textarea').append(
-                            '<span contenteditable="false"><a href=' + window.location.origin +
-                            '/user/view.php?id=' + user.value + '&course=' + courseid + ' target="_blank" userid="' +
-                            user.value + '">@' + user.key + '</a></span>&nbsp;'
-                        );
-                        $('mutation').get(0).scrollIntoView();
-                    } else if (useridpassed && windowhashash) {
-                        $('#hiddenadvancededitoreditable').empty();
+                    if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+                        if (useridpassed && !windowhashash) {
+                            $('.hsuforum-textarea').append(
+                                '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' +
+                                user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' +
+                                user.key + '</a></span>&nbsp;'
+                            );
+                            $('.hsuforum-textarea').get(0).scrollIntoView();
+                        } else if (useridpassed && windowhashash) {
+                            $('.hsuforum-textarea').empty();
+                        }
+                    }
+                    if (!$('#hiddenadvancededitoreditable').attr('data-tribute')) {
+                        tribute.attach(document.querySelectorAll('#hiddenadvancededitoreditable'));
+                        if (useridpassed && !windowhashash) {
+                            $('#hiddenadvancededitoreditable').append(
+                                '<span contenteditable="false"><a href=' + window.location.origin + '/user/view.php?id=' +
+                                user.value + '&course=' + courseid + ' target="_blank" userid="' + user.value + '">@' +
+                                user.key + '</a></span>&nbsp;'
+                            );
+                            $('#hiddenadvancededitoreditable').get(0).scrollIntoView();
+                        } else if (useridpassed && windowhashash) {
+                            $('#hiddenadvancededitoreditable').empty();
+                        }
                     }
                 }
             }, 1000);
